@@ -922,8 +922,7 @@
 </head>
 
 <body>
-    <div id="loading-overlay"
-        style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;display:flex;align-items:center;justify-content:center;">
+    <div id="loading-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;align-items:center;justify-content:center;">
         <div style="background:var(--surface);padding:30px;border-radius:16px;text-align:center;">
             <div style="font-size:40px;margin-bottom:12px;">⏳</div>
             <div style="font-weight:600;">Loading your data...</div>
@@ -1327,54 +1326,75 @@
 
     </main>
 
-    <script>
-        function toggleTheme() {
-            const b = document.body;
-            const c = b.getAttribute('data-theme');
-            b.setAttribute('data-theme', c === 'light' ? 'dark' : 'light');
-            localStorage.setItem('ssip-theme', b.getAttribute('data-theme'));
+<script>
+    function toggleTheme() {
+        const b = document.body;
+        const c = b.getAttribute('data-theme');
+        b.setAttribute('data-theme', c === 'light' ? 'dark' : 'light');
+        localStorage.setItem('ssip-theme', b.getAttribute('data-theme'));
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const saved = localStorage.getItem('ssip-theme') || 'dark';
+        document.body.setAttribute('data-theme', saved);
+        
+        // Remove loading state if it exists
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
         }
+    });
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const saved = localStorage.getItem('ssip-theme') || 'dark';
-            document.body.setAttribute('data-theme', saved);
-        });
+    // Load subjects for the analyzer
+    function loadSubjects() {
+        const branch = document.getElementById("branch");
+        const semester = document.getElementById("semester");
+        
+        if (!branch || !semester) return;
+        
+        const branchVal = branch.value;
+        const semesterVal = semester.value;
+        
+        if (!branchVal || !semesterVal) return;
+        
+        fetch("/get_subjects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ branch: branchVal, semester: semesterVal })
+        })
+        .then(r => r.json())
+        .then(data => {
+            const container = document.getElementById("subjects-container");
+            if (!container) return;
+            
+            container.innerHTML = "";
+            data.forEach((sub, i) => {
+                container.innerHTML += `
+                    <div class="subject-row">
+                        <div>
+                            <div class="subject-name">${sub.name}</div>
+                            <div class="subject-credit">${sub.credit} credits</div>
+                        </div>
+                        <input type="number" name="marks${i}" min="0" max="100" placeholder="Marks" required>
+                    </div>`;
+            });
+        })
+        .catch(err => console.error("Error loading subjects:", err));
+    }
 
-        document.getElementById("branch").addEventListener("change", loadSubjects);
-        document.getElementById("semester").addEventListener("change", loadSubjects);
-
-        function loadSubjects() {
-            const branch = document.getElementById("branch").value;
-            const semester = document.getElementById("semester").value;
-            if (!branch || !semester) return;
-            fetch("/get_subjects", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ branch, semester })
-            })
-                .then(r => r.json())
-                .then(data => {
-                    const container = document.getElementById("subjects-container");
-                    container.innerHTML = "";
-                    data.forEach((sub, i) => {
-                        container.innerHTML += `
-        <div class="subject-row">
-          <div>
-            <div class="subject-name">${sub.name}</div>
-            <div class="subject-credit">${sub.credit} credits</div>
-          </div>
-          <input type="number" name="marks${i}" min="0" max="100" placeholder="Marks" required>
-        </div>`;
-                    });
-                });
+    document.addEventListener('DOMContentLoaded', function() {
+        const branch = document.getElementById("branch");
+        const semester = document.getElementById("semester");
+        
+        if (branch) branch.addEventListener("change", loadSubjects);
+        if (semester) semester.addEventListener("change", loadSubjects);
+        
+        // Load subjects if both are selected
+        if (branch && semester && branch.value && semester.value) {
+            loadSubjects();
         }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            const b = document.getElementById("branch").value;
-            const s = document.getElementById("semester").value;
-            if (b && s) loadSubjects();
-        });
-    </script>
+    });
+</script>
 </body>
 
 </html>
