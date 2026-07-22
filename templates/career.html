@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSIP — Career Path</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #080810;
+            --surface: #0E0C1A;
+            --surface2: #13101F;
+            --border: rgba(255, 255, 255, 0.07);
+            --crimson: #DC2626;
+            --violet: #7C3AED;
+            --amber: #F59E0B;
+            --green: #22C55E;
+            --text: #F0EEFF;
+            --muted: #6B6A8A
+        }
+
+        [data-theme="light"] {
+            --bg: #F7F5FF;
+            --surface: #FFFFFF;
+            --surface2: #F0EEFF;
+            --border: rgba(124, 58, 237, 0.12);
+            --text: #0F0D1F;
+            --muted: #55536F
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            -webkit-font-smoothing: antialiased;
+            transition: background .3s, color .3s
+        }
+
+        /* ---------- SIDEBAR ---------- */
+        .sidebar {
+            width: 220px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 20;
+            overflow-y: auto
+        }
+
+        .sb-top {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .logo-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 1px;
+            letter-spacing: .05em
+        }
+
+        .nav {
+            padding: 0 10px
+        }
+
+        .nav-label {
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            padding: 8px 6px 3px
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 1px;
+            transition: all .15s
+        }
+
+        .nav-item:hover {
+            background: rgba(124, 58, 237, .1);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: rgba(220, 38, 38, .15);
+            color: #F87171
+        }
+
+        .sb-footer {
+            margin-top: auto;
+            padding: 12px 16px 0;
+            border-top: 1px solid var(--border)
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0
+        }
+
+        .u-name {
+            font-size: 12px;
+            font-weight: 600
+        }
+
+        .u-role {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .logout {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            color: #F87171;
+            font-size: 12px;
+            text-decoration: none;
+            margin-top: 6px;
+            font-weight: 500
+        }
+
+        .logout:hover {
+            background: rgba(248, 113, 113, .1)
+        }
+
+        /* ---------- MAIN ---------- */
+        .main {
+            margin-left: 220px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto
+        }
+
+        .topbar {
+            padding: 20px 28px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            z-index: 10;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.03em
+        }
+
+        .page-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .theme-btn,
+        .career-select {
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px
+        }
+
+        .theme-btn {
+            width: 32px;
+            height: 32px
+        }
+
+        .career-select {
+            padding: 7px 12px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            outline: none
+        }
+
+        .content {
+            padding: 22px 28px 44px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .card-title span.sub {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted)
+        }
+
+        /* ---------- HERO / RECOMMENDED CAREER ---------- */
+        .hero-card {
+            background: linear-gradient(135deg, rgba(220, 38, 38, .12), rgba(124, 58, 237, .12));
+            border: 1px solid rgba(124, 58, 237, .3);
+            border-radius: 18px;
+            padding: 26px;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 24px;
+            align-items: center
+        }
+
+        .hero-emoji {
+            font-size: 46px
+        }
+
+        .hero-label {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .06em
+        }
+
+        .hero-career {
+            font-family: 'Syne', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 2px
+        }
+
+        .hero-based-on {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px
+        }
+
+        .based-chip {
+            font-size: 11px;
+            padding: 4px 9px;
+            border-radius: 99px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text)
+        }
+
+        .match-ring-wrap {
+            text-align: center
+        }
+
+        .match-ring {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative
+        }
+
+        .match-ring-inner {
+            width: 78px;
+            height: 78px;
+            border-radius: 50%;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center
+        }
+
+        .match-ring-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800
+        }
+
+        .match-ring-label {
+            font-size: 9px;
+            color: var(--muted)
+        }
+
+        .confidence-badge {
+            margin-top: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 99px;
+            display: inline-block
+        }
+
+        .confidence-badge.High {
+            background: rgba(34, 197, 94, .15);
+            color: #4ADE80
+        }
+
+        .confidence-badge.Medium {
+            background: rgba(245, 158, 11, .15);
+            color: #FBBF24
+        }
+
+        .confidence-badge.Growing {
+            background: rgba(220, 38, 38, .15);
+            color: #F87171
+        }
+
+        /* ---------- SKILL GAP ---------- */
+        .skill-row {
+            margin-bottom: 14px
+        }
+
+        .skill-row:last-child {
+            margin-bottom: 0
+        }
+
+        .skill-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px
+        }
+
+        .skill-top .nums {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500
+        }
+
+        .skill-bar-bg {
+            height: 10px;
+            border-radius: 99px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            transition: width .6s ease
+        }
+
+        .skill-bar-required {
+            position: absolute;
+            top: -2px;
+            bottom: -2px;
+            width: 2px;
+            background: var(--amber)
+        }
+
+        /* ---------- READINESS GRID ---------- */
+        .readiness-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px
+        }
+
+        .readiness-item {
+            text-align: center;
+            padding: 14px 8px;
+            border-radius: 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border)
+        }
+
+        .readiness-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800
+        }
+
+        .readiness-label {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 3px
+        }
+
+        .readiness-overall {
+            margin-top: 16px;
+            padding: 14px;
+            border-radius: 12px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(220, 38, 38, .15), rgba(124, 58, 237, .15));
+            border: 1px solid rgba(124, 58, 237, .3)
+        }
+
+        .readiness-overall .readiness-num {
+            font-size: 30px
+        }
+
+        /* ---------- MISSING SKILLS ---------- */
+        .missing-skills-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px
+        }
+
+        .missing-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 8px;
+            background: rgba(245, 158, 11, .12);
+            border: 1px solid rgba(245, 158, 11, .3);
+            font-size: 12px;
+            font-weight: 600;
+            color: #FBBF24
+        }
+
+        /* ---------- ROADMAP ---------- */
+        .roadmap-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0
+        }
+
+        .roadmap-month {
+            display: flex;
+            gap: 14px;
+            position: relative;
+            padding-bottom: 18px
+        }
+
+        .roadmap-month:last-child {
+            padding-bottom: 0
+        }
+
+        .roadmap-dot-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center
+        }
+
+        .roadmap-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--violet);
+            flex-shrink: 0;
+            margin-top: 4px
+        }
+
+        .roadmap-line {
+            width: 2px;
+            flex: 1;
+            background: var(--border);
+            margin-top: 4px
+        }
+
+        .roadmap-body {
+            flex: 1
+        }
+
+        .roadmap-month-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #A78BFA;
+            margin-bottom: 6px
+        }
+
+        .roadmap-step {
+            font-size: 13px;
+            padding: 3px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .roadmap-step.done {
+            color: var(--green)
+        }
+
+        .level-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 99px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text)
+        }
+
+        /* ---------- CERTIFICATIONS ---------- */
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px
+        }
+
+        .cert-card {
+            padding: 14px;
+            border-radius: 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 6px
+        }
+
+        .cert-title {
+            font-size: 13px;
+            font-weight: 700
+        }
+
+        .cert-meta {
+            font-size: 11px;
+            color: var(--muted);
+            display: flex;
+            gap: 8px
+        }
+
+        .cert-link {
+            margin-top: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #A78BFA;
+            text-decoration: none
+        }
+
+        .cert-link:hover {
+            text-decoration: underline
+        }
+
+        /* ---------- PROJECTS ---------- */
+        .project-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px
+        }
+
+        .project-tab {
+            padding: 6px 14px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--muted)
+        }
+
+        .project-tab.active {
+            background: rgba(124, 58, 237, .18);
+            border-color: rgba(124, 58, 237, .5);
+            color: #A78BFA
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px
+        }
+
+        .project-card {
+            padding: 14px;
+            border-radius: 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border)
+        }
+
+        .project-name {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 4px
+        }
+
+        .project-tech {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 8px
+        }
+
+        .project-link {
+            font-size: 12px;
+            font-weight: 700;
+            color: #A78BFA;
+            text-decoration: none
+        }
+
+        .project-link:hover {
+            text-decoration: underline
+        }
+
+        /* ---------- COMPANIES ---------- */
+        .companies-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px
+        }
+
+        .company-col-title {
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: .04em
+        }
+
+        .company-col-title.dream {
+            color: #F87171
+        }
+
+        .company-col-title.good {
+            color: #FBBF24
+        }
+
+        .company-col-title.easy {
+            color: #4ADE80
+        }
+
+        .company-chip {
+            display: block;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            text-decoration: none;
+            margin-bottom: 6px;
+            transition: all .15s
+        }
+
+        .company-chip:hover {
+            border-color: rgba(124, 58, 237, .4);
+            color: #A78BFA
+        }
+
+        /* ---------- SALARY ---------- */
+        .salary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px
+        }
+
+        .salary-card {
+            text-align: center;
+            padding: 18px 10px;
+            border-radius: 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border)
+        }
+
+        .salary-level {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: 6px
+        }
+
+        .salary-amount {
+            font-family: 'Syne', sans-serif;
+            font-size: 17px;
+            font-weight: 800;
+            color: #4ADE80
+        }
+
+        /* ---------- RESUME READINESS ---------- */
+        .resume-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px
+        }
+
+        .resume-stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px
+        }
+
+        .resume-stat-row:last-child {
+            border-bottom: none
+        }
+
+        .resume-improve-item {
+            font-size: 12px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: rgba(245, 158, 11, .1);
+            border: 1px solid rgba(245, 158, 11, .25);
+            margin-bottom: 6px;
+            color: #FBBF24;
+            font-weight: 600
+        }
+
+        /* ---------- INTERNSHIPS ---------- */
+        .internship-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px
+        }
+
+        .internship-btn {
+            padding: 10px 16px;
+            border-radius: 9px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            transition: all .15s
+        }
+
+        .internship-btn:hover {
+            border-color: rgba(220, 38, 38, .4);
+            color: #F87171
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 10px;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 99px
+        }
+
+        @media (max-width: 1000px) {
+            .hero-card {
+                grid-template-columns: 1fr;
+                text-align: center
+            }
+
+            .readiness-grid,
+            .companies-grid,
+            .salary-grid,
+            .resume-grid {
+                grid-template-columns: 1fr
+            }
+        }
+    </style>
+    <script>
+        (function () {
+            const theme = localStorage.getItem('ssip-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+
+    <nav class="sidebar">
+        <div class="sb-top">
+            <div class="logo">SSIP</div>
+            <div class="logo-sub">Intelligence Platform</div>
+        </div>
+        <div class="nav">
+            <div class="nav-label">Main</div>
+            <a href="/" class="nav-item">🏠 Dashboard</a>
+            <a href="/profile" class="nav-item">👤 Profile</a>
+            <a href="/analytics" class="nav-item">📊 Analytics</a>
+            <div class="nav-label">AI Features</div>
+            <a href="/ai-mentor" class="nav-item">🤖 AI Mentor</a>
+            <a href="/study-planner" class="nav-item">📅 Study Planner</a>
+            <a href="/placement" class="nav-item">🏆 Placement</a>
+            <a href="/career" class="nav-item active">🎯 Career Path</a>
+            <div class="nav-label">Tools</div>
+            <a href="/skills" class="nav-item">⚡ Skills</a>
+            <a href="/reports" class="nav-item">📄 Reports</a>
+        </div>
+        <div class="sb-footer">
+            <div class="user-row">
+                <div class="avatar">{{ session['user'][0].upper() }}</div>
+                <div>
+                    <div class="u-name">{{ session.get('user_name', session['user']).split()[0] }}</div>
+                    <div class="u-role">Student · MITSGWL</div>
+                </div>
+            </div>
+            <a href="/logout" class="logout">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <div class="page-title">🎯 Career Path</div>
+                <div class="page-sub" id="pageSub">Building your personalized career dashboard...</div>
+            </div>
+            <div class="topbar-actions">
+                <select class="career-select" id="careerSelect" onchange="onCareerChange()">
+                    {% for c in career_list %}
+                    <option value="{{ c }}">{{ c }}</option>
+                    {% endfor %}
+                </select>
+                <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+            </div>
+        </div>
+
+        <div class="content">
+
+            <!-- 1+2: RECOMMENDED CAREER + MATCH SCORE -->
+            <div class="hero-card">
+                <div class="hero-emoji" id="heroEmoji">🎯</div>
+                <div>
+                    <div class="hero-label">Recommended Career Path</div>
+                    <div class="hero-career" id="heroCareer">–</div>
+                    <div class="hero-based-on" id="heroBasedOn"></div>
+                </div>
+                <div class="match-ring-wrap">
+                    <div class="match-ring" id="matchRing">
+                        <div class="match-ring-inner">
+                            <div class="match-ring-num" id="matchScoreNum">–</div>
+                            <div class="match-ring-label">MATCH</div>
+                        </div>
+                    </div>
+                    <div class="confidence-badge" id="confidenceBadge">–</div>
+                </div>
+            </div>
+
+            <!-- 3: SKILL GAP ANALYSIS -->
+            <div class="card">
+                <div class="card-title">Skill Gap Analysis<span class="sub">your current level vs what this role
+                        needs</span></div>
+                <div id="skillGapWrap">
+                    <div class="empty-state">Loading...</div>
+                </div>
+            </div>
+
+            <!-- 4: CAREER READINESS -->
+            <div class="card">
+                <div class="card-title">Career Readiness</div>
+                <div class="readiness-grid" id="readinessGrid"></div>
+                <div class="readiness-overall">
+                    <div class="readiness-num" id="overallScore">–</div>
+                    <div class="readiness-label">Overall Readiness Score</div>
+                </div>
+            </div>
+
+            <!-- 5: MISSING SKILLS -->
+            <div class="card">
+                <div class="card-title">Missing Skills (Most Important)<span class="sub">focus here first</span></div>
+                <div class="missing-skills-wrap" id="missingSkillsWrap"></div>
+            </div>
+
+            <!-- 6: ROADMAP -->
+            <div class="card">
+                <div class="card-title">
+                    Learning Roadmap
+                    <span class="level-badge" id="levelBadge">Level: –</span>
+                </div>
+                <div class="roadmap-timeline" id="roadmapWrap"></div>
+            </div>
+
+            <!-- 7: CERTIFICATIONS -->
+            <div class="card">
+                <div class="card-title">Recommended Certifications</div>
+                <div class="cert-grid" id="certGrid"></div>
+            </div>
+
+            <!-- 8: PROJECTS -->
+            <div class="card">
+                <div class="card-title">Project Recommendations</div>
+                <div class="project-tabs" id="projectTabs"></div>
+                <div class="project-grid" id="projectGrid"></div>
+            </div>
+
+            <!-- 9: COMPANIES -->
+            <div class="card">
+                <div class="card-title">Companies To Target</div>
+                <div class="companies-grid" id="companiesGrid"></div>
+            </div>
+
+            <!-- 10: SALARY -->
+            <div class="card">
+                <div class="card-title">Salary Insights<span class="sub">India, approximate</span></div>
+                <div class="salary-grid" id="salaryGrid"></div>
+            </div>
+
+            <!-- 11: CAREER MATCH GRAPH -->
+            <div class="card">
+                <div class="card-title">Job Roles Matching You<span class="sub">best matches across all paths</span>
+                </div>
+                <canvas id="matchChart" height="140"></canvas>
+            </div>
+
+            <!-- 12: RESUME READINESS -->
+            <div class="card">
+                <div class="card-title">Resume Readiness Checker</div>
+                <div class="resume-grid">
+                    <div>
+                        <div class="resume-stat-row"><span>Projects Completed</span><strong id="resProjects">–</strong>
+                        </div>
+                        <div class="resume-stat-row"><span>Recommended</span><strong id="resRecommended">5</strong>
+                        </div>
+                        <div class="resume-stat-row"><span>GitHub Activity</span><strong id="resGithub">–</strong></div>
+                        <div class="resume-stat-row"><span>Resume Strength</span><strong id="resStrength">–</strong>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="upcoming-label"
+                            style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase">
+                            Improvement Needed</div>
+                        <div id="resImprovements"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INTERNSHIP OPPORTUNITIES -->
+            <div class="card">
+                <div class="card-title">Internship Opportunities</div>
+                <div class="internship-row" id="internshipRow"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const studentName = "{{ session.get('user_name', 'Student').split()[0] }}";
+        const initialCareer = "{{ profile['career_goal'] if profile and profile['career_goal'] else '' }}";
+        let matchChartInstance = null;
+        let currentProjectTab = 'Beginner';
+        let lastData = null;
+
+        function toggleTheme() {
+            const b = document.body;
+            b.setAttribute('data-theme', b.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+            localStorage.setItem('ssip-theme', b.getAttribute('data-theme'));
+            if (lastData) renderMatchChart(lastData.best_matches);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.body.setAttribute('data-theme', localStorage.getItem('ssip-theme') || 'dark');
+            loadCareerData();
+        });
+
+        function onCareerChange() {
+            loadCareerData(document.getElementById('careerSelect').value);
+        }
+
+        async function loadCareerData(careerKey = null) {
+            try {
+                const url = careerKey ? `/career/data?career=${encodeURIComponent(careerKey)}` : '/career/data';
+                const res = await fetch(url);
+                const data = await res.json();
+                if (data.error) {
+                    document.getElementById('pageSub').textContent = data.error;
+                    return;
+                }
+                lastData = data;
+                document.getElementById('careerSelect').value = data.career_key;
+                document.getElementById('pageSub').textContent = `Personalized for ${studentName} — based on your live profile data`;
+
+                renderHero(data);
+                renderSkillGap(data.skill_gap);
+                renderReadiness(data.readiness);
+                renderMissingSkills(data.missing_skills);
+                renderRoadmap(data.roadmap, data.current_level);
+                renderCerts(data.certifications);
+                renderProjects(data.projects);
+                renderCompanies(data.companies);
+                renderSalary(data.salary);
+                renderMatchChart(data.best_matches);
+                renderResume(data.resume_readiness);
+                renderInternships(data.internship_links);
+            } catch (e) {
+                document.getElementById('pageSub').textContent = 'Could not load career data — check Flask server.';
+                console.error(e);
+            }
+        }
+
+        function renderHero(data) {
+            document.getElementById('heroEmoji').textContent = data.emoji;
+            document.getElementById('heroCareer').textContent = data.career_key;
+            document.getElementById('heroBasedOn').innerHTML = data.based_on.map(b => `<span class="based-chip">✓ ${b}</span>`).join('');
+            document.getElementById('matchScoreNum').textContent = data.match_score + '%';
+            const ring = document.getElementById('matchRing');
+            const deg = Math.round((data.match_score / 100) * 360);
+            ring.style.background = `conic-gradient(#7C3AED ${deg}deg, var(--surface2) ${deg}deg)`;
+            const badge = document.getElementById('confidenceBadge');
+            badge.textContent = data.confidence + ' Confidence';
+            badge.className = 'confidence-badge ' + data.confidence;
+        }
+
+        function renderSkillGap(rows) {
+            const wrap = document.getElementById('skillGapWrap');
+            if (!rows.length) { wrap.innerHTML = '<div class="empty-state">No skill data yet.</div>'; return; }
+            wrap.innerHTML = rows.map(r => `
+        <div class="skill-row">
+          <div class="skill-top"><span>${r.skill}</span><span class="nums">${r.current}% / ${r.required}% required</span></div>
+          <div class="skill-bar-bg">
+            <div class="skill-bar-fill" style="width:${r.current}%"></div>
+            <div class="skill-bar-required" style="left:${r.required}%"></div>
+          </div>
+        </div>
+      `).join('');
+        }
+
+        function renderReadiness(r) {
+            const grid = document.getElementById('readinessGrid');
+            const items = [
+                { label: 'Technical Skills', value: r.technical_skills },
+                { label: 'Projects', value: r.projects },
+                { label: 'Communication', value: r.communication },
+                { label: 'Problem Solving', value: r.problem_solving },
+                { label: 'Resume Strength', value: r.resume_strength },
+                { label: 'Placement Readiness', value: r.placement_readiness },
+            ];
+            grid.innerHTML = items.map(i => `
+        <div class="readiness-item">
+          <div class="readiness-num">${i.value}%</div>
+          <div class="readiness-label">${i.label}</div>
+        </div>
+      `).join('');
+            document.getElementById('overallScore').textContent = r.overall + '%';
+        }
+
+        function renderMissingSkills(skills) {
+            const wrap = document.getElementById('missingSkillsWrap');
+            if (!skills.length) { wrap.innerHTML = '<div class="empty-state">You\'re covering all key skills for this path! 🎉</div>'; return; }
+            wrap.innerHTML = skills.map(s => `<div class="missing-chip">⚠ ${s}</div>`).join('');
+        }
+
+        function renderRoadmap(roadmap, level) {
+            document.getElementById('levelBadge').textContent = 'Level: ' + level;
+            const wrap = document.getElementById('roadmapWrap');
+            wrap.innerHTML = roadmap.map((m, i) => `
+        <div class="roadmap-month">
+          <div class="roadmap-dot-wrap">
+            <div class="roadmap-dot"></div>
+            ${i < roadmap.length - 1 ? '<div class="roadmap-line"></div>' : ''}
+          </div>
+          <div class="roadmap-body">
+            <div class="roadmap-month-label">${m.month}</div>
+            ${m.steps.map(s => `<div class="roadmap-step ${s.done ? 'done' : ''}">${s.done ? '✓' : '→'} ${s.text}</div>`).join('')}
+          </div>
+        </div>
+      `).join('');
+        }
+
+        function renderCerts(certs) {
+            document.getElementById('certGrid').innerHTML = certs.map(c => `
+        <div class="cert-card">
+          <div class="cert-title">${c.title}</div>
+          <div class="cert-meta"><span>${c.difficulty}</span><span>·</span><span>${c.duration}</span></div>
+          <a class="cert-link" href="${c.link}" target="_blank" rel="noopener">Open Course →</a>
+        </div>
+      `).join('');
+        }
+
+        function renderProjects(projects) {
+            const tabs = Object.keys(projects);
+            if (!tabs.includes(currentProjectTab)) currentProjectTab = tabs[0];
+            document.getElementById('projectTabs').innerHTML = tabs.map(t => `
+        <div class="project-tab ${t === currentProjectTab ? 'active' : ''}" onclick="switchProjectTab('${t}')">${t}</div>
+      `).join('');
+            document.getElementById('projectGrid').innerHTML = projects[currentProjectTab].map(p => `
+        <div class="project-card">
+          <div class="project-name">${p.name}</div>
+          <div class="project-tech">${p.tech}</div>
+          <a class="project-link" href="${p.link}" target="_blank" rel="noopener">See Examples on GitHub →</a>
+        </div>
+      `).join('');
+        }
+
+        function switchProjectTab(tab) {
+            currentProjectTab = tab;
+            if (lastData) renderProjects(lastData.projects);
+        }
+
+        function renderCompanies(companies) {
+            const cols = [
+                { key: 'Dream', cls: 'dream' },
+                { key: 'Good', cls: 'good' },
+                { key: 'Easy Entry', cls: 'easy' },
+            ];
+            document.getElementById('companiesGrid').innerHTML = cols.map(col => `
+        <div>
+          <div class="company-col-title ${col.cls}">${col.key}</div>
+          ${(companies[col.key] || []).map(name => `<a class="company-chip" href="https://www.google.com/search?q=${encodeURIComponent(name + ' careers')}" target="_blank" rel="noopener">${name}</a>`).join('')}
+        </div>
+      `).join('');
+        }
+
+        function renderSalary(salary) {
+            document.getElementById('salaryGrid').innerHTML = Object.entries(salary).map(([level, amount]) => `
+        <div class="salary-card">
+          <div class="salary-level">${level}</div>
+          <div class="salary-amount">${amount}</div>
+        </div>
+      `).join('');
+        }
+
+        function renderMatchChart(bestMatches) {
+            const ctx = document.getElementById('matchChart').getContext('2d');
+            const isLight = document.body.getAttribute('data-theme') === 'light';
+            const textColor = isLight ? '#55536F' : '#6B6A8A';
+
+            if (matchChartInstance) matchChartInstance.destroy();
+            matchChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: bestMatches.map(m => m.career),
+                    datasets: [{
+                        data: bestMatches.map(m => m.match),
+                        backgroundColor: bestMatches.map(() => {
+                            const grad = ctx.createLinearGradient(0, 0, 400, 0);
+                            grad.addColorStop(0, '#DC2626');
+                            grad.addColorStop(1, '#7C3AED');
+                            return grad;
+                        }),
+                        borderRadius: 8,
+                        maxBarThickness: 30
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw + '% match' } } },
+                    scales: {
+                        x: { min: 0, max: 100, ticks: { color: textColor, callback: v => v + '%' }, grid: { color: 'rgba(128,128,128,.1)' } },
+                        y: { ticks: { color: textColor }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function renderResume(r) {
+            document.getElementById('resProjects').textContent = r.projects_completed;
+            document.getElementById('resRecommended').textContent = r.recommended_projects;
+            document.getElementById('resGithub').textContent = r.github_activity;
+            document.getElementById('resStrength').textContent = r.resume_strength;
+            document.getElementById('resImprovements').innerHTML = r.improvements.map(i => `<div class="resume-improve-item">✓ ${i}</div>`).join('');
+        }
+
+        function renderInternships(links) {
+            document.getElementById('internshipRow').innerHTML = links.map(l => `
+        <a class="internship-btn" href="${l.url}" target="_blank" rel="noopener">🔗 ${l.name}</a>
+      `).join('');
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSIP - Placement Readiness</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080810;
+            --surface: #0E0C1A;
+            --surface2: #13101F;
+            --border: rgba(255, 255, 255, 0.07);
+            --crimson: #DC2626;
+            --violet: #7C3AED;
+            --text: #F0EEFF;
+            --muted: #6B6A8A;
+            --success: #22C55E;
+            --warning: #FBBF24;
+            --info: #60A5FA;
+            --danger: #F87171;
+        }
+
+        [data-theme="light"] {
+            --bg: #F7F5FF;
+            --surface: #FFFFFF;
+            --surface2: #F0EEFF;
+            --border: rgba(124, 58, 237, 0.12);
+            --text: #0F0D1F;
+            --muted: #6B6A8A;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-size: 14px;
+            line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            -webkit-font-smoothing: antialiased;
+            transition: background .3s, color .3s;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 20;
+            overflow-y: auto;
+        }
+
+        .sb-top {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px
+        }
+
+        .logo {
+            font-family: 'Manrope', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-sub {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 1px;
+            letter-spacing: .05em
+        }
+
+        .nav {
+            padding: 0 10px
+        }
+
+        .nav-label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            padding: 8px 6px 3px
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 1px;
+            transition: all .15s;
+        }
+
+        .nav-item:hover {
+            background: rgba(124, 58, 237, .1);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: rgba(220, 38, 38, .15);
+            color: #F87171
+        }
+
+        .sb-footer {
+            margin-top: auto;
+            padding: 12px 16px 0;
+            border-top: 1px solid var(--border)
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .u-name {
+            font-size: 12px;
+            font-weight: 600
+        }
+
+        .u-role {
+            font-size: 10px;
+            color: var(--muted)
+        }
+
+        .logout {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            color: #F87171;
+            font-size: 12px;
+            text-decoration: none;
+            margin-top: 6px;
+            font-weight: 500
+        }
+
+        .logout:hover {
+            background: rgba(248, 113, 113, .1)
+        }
+
+        .main {
+            margin-left: 220px;
+            flex: 1;
+            padding: 28px 32px;
+            max-width: calc(100vw - 220px)
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            gap: 16px
+        }
+
+        .page-title {
+            font-family: 'Manrope', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.03em
+        }
+
+        .page-sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 3px
+        }
+
+        .theme-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+            gap: 16px;
+            margin-bottom: 16px
+        }
+
+        .layout-reverse {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+            gap: 16px;
+            margin-bottom: 16px
+        }
+
+        .three-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px 22px
+        }
+
+        .panel-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px
+        }
+
+        .panel-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.01em
+        }
+
+        .panel-sub {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .readiness-box {
+            display: grid;
+            gap: 12px
+        }
+
+        .readiness-score {
+            font-family: 'Manrope', sans-serif;
+            font-size: 46px;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            line-height: 1;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .status-pill {
+            display: inline-flex;
+            width: fit-content;
+            padding: 5px 12px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 700;
+            border: 1px solid var(--border);
+            background: var(--surface2)
+        }
+
+        .pill-ready {
+            color: #4ADE80;
+            border-color: rgba(74, 222, 128, .25);
+            background: rgba(74, 222, 128, .1)
+        }
+
+        .pill-progress {
+            color: #FBBF24;
+            border-color: rgba(251, 191, 36, .25);
+            background: rgba(251, 191, 36, .1)
+        }
+
+        .pill-start {
+            color: #F87171;
+            border-color: rgba(248, 113, 113, .25);
+            background: rgba(248, 113, 113, .1)
+        }
+
+        .plain-note {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.55
+        }
+
+        .focus-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 8px
+        }
+
+        .focus-label {
+            color: var(--muted);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            font-weight: 700;
+            margin-bottom: 4px
+        }
+
+        .focus-text {
+            font-size: 13px;
+            font-weight: 600
+        }
+
+        .check-list,
+        .resource-list,
+        .role-list,
+        .prep-list {
+            display: grid;
+            gap: 9px
+        }
+
+        .check-row {
+            display: grid;
+            grid-template-columns: 28px 1fr auto;
+            align-items: center;
+            gap: 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px
+        }
+
+        .check-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800
+        }
+
+        .ok {
+            color: #4ADE80;
+            background: rgba(74, 222, 128, .12)
+        }
+
+        .warn {
+            color: #FBBF24;
+            background: rgba(251, 191, 36, .12)
+        }
+
+        .bad {
+            color: #F87171;
+            background: rgba(248, 113, 113, .12)
+        }
+
+        .check-title {
+            font-size: 12px;
+            font-weight: 700
+        }
+
+        .check-desc {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 1px
+        }
+
+        .tag {
+            white-space: nowrap;
+            border: 1px solid var(--border);
+            border-radius: 99px;
+            padding: 4px 8px;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 700
+        }
+
+        .roadmap {
+            display: grid;
+            gap: 0
+        }
+
+        .road-step {
+            position: relative;
+            display: grid;
+            grid-template-columns: 34px 1fr;
+            gap: 12px;
+            padding-bottom: 18px
+        }
+
+        .road-step:last-child {
+            padding-bottom: 0
+        }
+
+        .road-step::after {
+            content: '';
+            position: absolute;
+            left: 16px;
+            top: 35px;
+            bottom: 0;
+            width: 1px;
+            background: var(--border)
+        }
+
+        .road-step:last-child::after {
+            display: none
+        }
+
+        .road-num {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            z-index: 1
+        }
+
+        .road-title {
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 2px
+        }
+
+        .road-desc {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5
+        }
+
+        .prep-card,
+        .resource-card,
+        .role-card,
+        .resume-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px
+        }
+
+        .prep-card b,
+        .resource-card b,
+        .role-card b,
+        .resume-card b {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px
+        }
+
+        .prep-card span,
+        .resource-card span,
+        .role-card span,
+        .resume-card span {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5
+        }
+
+        .resume-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px
+        }
+
+        .resource-card a {
+            color: #A78BFA;
+            text-decoration: none;
+            font-weight: 700
+        }
+
+        .resource-card a:hover {
+            color: #F87171
+        }
+
+        .role-score {
+            margin-top: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #F87171
+        }
+
+        .empty {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 40px;
+            text-align: center;
+            color: var(--muted)
+        }
+
+        [data-theme="light"] .panel {
+            background: #fff;
+            border-color: rgba(124, 58, 237, .1)
+        }
+
+        [data-theme="light"] .focus-card,
+        [data-theme="light"] .check-row,
+        [data-theme="light"] .prep-card,
+        [data-theme="light"] .resource-card,
+        [data-theme="light"] .role-card,
+        [data-theme="light"] .resume-card {
+            background: #F7F5FF;
+            border-color: rgba(124, 58, 237, .08)
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(124, 58, 237, .3);
+            border-radius: 20px
+        }
+
+        @media(max-width:1100px) {
+
+            .layout,
+            .layout-reverse,
+            .three-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:700px) {
+            .sidebar {
+                display: none
+            }
+
+            .main {
+                margin-left: 0;
+                max-width: 100vw;
+                padding: 16px
+            }
+
+            .topbar {
+                align-items: flex-start
+            }
+
+            .resume-grid {
+                grid-template-columns: 1fr
+            }
+
+            .company-grid,
+            .insight-grid {
+                grid-template-columns: 1fr
+            }
+
+            .readiness-hero-top {
+                flex-direction: column;
+                align-items: flex-start
+            }
+        }
+
+        .readiness-hero-top {
+            display: flex;
+            align-items: center;
+            gap: 18px
+        }
+
+        .circular-progress {
+            --pct: 0%;
+            width: 116px;
+            height: 116px;
+            min-width: 116px;
+            border-radius: 50%;
+            background: conic-gradient(var(--crimson) 0%, var(--violet) var(--pct), var(--surface2) 0);
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+
+        .circular-progress-inner {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            background: var(--surface);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center
+        }
+
+        .circular-progress-value {
+            font-family: 'Manrope', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .circular-progress-label {
+            font-size: 9px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            font-weight: 700;
+            margin-top: 2px
+        }
+
+        .role-bar-track {
+            width: 100%;
+            height: 6px;
+            border-radius: 99px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            margin-top: 8px;
+            overflow: hidden
+        }
+
+        .role-bar-fill {
+            display: block;
+            height: 100%;
+            width: 0%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--crimson), var(--violet));
+            transition: width 1.1s cubic-bezier(.4, 0, .2, 1)
+        }
+
+        .company-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px
+        }
+
+        .company-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px
+        }
+
+        .company-card-head {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 6px;
+            flex-wrap: wrap
+        }
+
+        .company-icon {
+            font-size: 13px
+        }
+
+        .company-card-head b {
+            font-size: 12px;
+            flex: 1
+        }
+
+        .eligibility-badge {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 99px;
+            border: 1px solid var(--border);
+            white-space: nowrap
+        }
+
+        .badge-yes {
+            color: #4ADE80;
+            background: rgba(74, 222, 128, .12);
+            border-color: rgba(74, 222, 128, .25)
+        }
+
+        .badge-partial {
+            color: #FBBF24;
+            background: rgba(251, 191, 36, .12);
+            border-color: rgba(251, 191, 36, .25)
+        }
+
+        .badge-no {
+            color: #F87171;
+            background: rgba(248, 113, 113, .12);
+            border-color: rgba(248, 113, 113, .25)
+        }
+
+        .company-reason {
+            display: block;
+            font-size: 10px;
+            color: var(--muted);
+            line-height: 1.5
+        }
+
+        .company-reason.ok-reason {
+            color: #4ADE80
+        }
+
+        .interview-meter-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 10px
+        }
+
+        .interview-score {
+            font-family: 'Manrope', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .road-title-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 2px
+        }
+
+        .priority-badge {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 99px;
+            border: 1px solid var(--border);
+            white-space: nowrap
+        }
+
+        .priority-high {
+            color: #F87171;
+            background: rgba(248, 113, 113, .12);
+            border-color: rgba(248, 113, 113, .25)
+        }
+
+        .priority-medium {
+            color: #FBBF24;
+            background: rgba(251, 191, 36, .12);
+            border-color: rgba(251, 191, 36, .25)
+        }
+
+        .priority-low {
+            color: #60A5FA;
+            background: rgba(96, 165, 250, .12);
+            border-color: rgba(96, 165, 250, .25)
+        }
+
+        .insight-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px
+        }
+
+        .insight-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px
+        }
+
+        .full-panel-wrap {
+            margin-bottom: 16px
+        }
+
+        [data-theme="light"] .company-card,
+        [data-theme="light"] .insight-item {
+            background: #F7F5FF;
+            border-color: rgba(124, 58, 237, .08)
+        }
+    </style>
+    <script>
+        (function () {
+            const theme = localStorage.getItem('ssip-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="sb-top">
+            <div class="logo">SSIP</div>
+            <div class="logo-sub">Intelligence Platform</div>
+        </div>
+        <div class="nav">
+            <div class="nav-label">Main</div>
+            <a href="/" class="nav-item">🏠 Dashboard</a>
+            <a href="/profile" class="nav-item">👤 Profile</a>
+            <a href="/analytics" class="nav-item">📊 Analytics</a>
+            <div class="nav-label">AI Features</div>
+            <a href="/ai-mentor" class="nav-item">🤖 AI Mentor</a>
+            <a href="/study-planner" class="nav-item">📅 Study Planner</a>
+            <a href="/placement" class="nav-item active">🏆 Placement</a>
+            <a href="/career" class="nav-item">🎯 Career Path</a>
+            <div class="nav-label">Tools</div>
+            <a href="/skills" class="nav-item">⚡ Skills</a>
+            <a href="/reports" class="nav-item">📄 Reports</a>
+        </div>
+        <div class="sb-footer">
+            <div class="user-row">
+                <div class="avatar">{{ session['user'][0].upper() }}</div>
+                <div>
+                    <div class="u-name">{{ session.get('user_name', session['user']).split()[0] }}</div>
+                    <div class="u-role">Student · MITSGWL</div>
+                </div>
+            </div>
+            <a href="/logout" class="logout">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <div class="page-title">Placement Readiness</div>
+                <div class="page-sub">A calm preparation guide for eligibility, resume, interviews and useful job
+                    resources.</div>
+            </div>
+            <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+        </div>
+
+        {% if profile %}
+        {% set pr = profile['placement_readiness'] or 0 %}
+        {% set cgpa = profile['cgpa'] or 0 %}
+        {% set coding = profile['coding_skill'] or 0 %}
+        {% set problem = profile['problem_solving'] or 0 %}
+        {% set communication = profile['communication'] or 0 %}
+        {% set teamwork = profile['teamwork'] or 0 %}
+        {% set project_skill = profile['project_skill'] or 0 %}
+        {% set technical = (((coding + problem + project_skill) / 15) * 100)|round|int %}
+        {% set comm_score = (communication * 20)|round|int %}
+        {% set projects_map = {'0':10,'1-2':45,'1–2':45,'3-5':72,'3–5':72,'5+':92,'6-10':95,'6–10':95,'More than
+        10':100} %}
+        {% set projects = projects_map.get(profile['projects_completed'] or '0', 35) %}
+        {% set freq_map = {'Daily':95,'3-5 Times a Week':82,'3–5 Times a Week':82,'1-2 Times a Week':58,'1–2 Times a
+        Week':58,'Rarely':32,'Never':8} %}
+        {% set consistency = freq_map.get(profile['coding_frequency'] or '', 50) %}
+        {% set has_backlog = profile['backlog'] == 'Yes' %}
+        {% set cgpa_ok = cgpa >= 7 %}
+        {% set backlog_ok = not has_backlog %}
+        {% set projects_ok = projects >= 45 %}
+        {% set skills_ok = technical >= 55 %}
+        {% set eligibility = (1 if cgpa_ok else 0) + (1 if backlog_ok else 0) + (1 if projects_ok else 0) + (1 if
+        skills_ok else 0) %}
+        {% set frontend = [((coding * 12) + (project_skill * 10) + (communication * 5) + (projects * 0.15))|round|int,
+        100]|min %}
+        {% set backend = [((coding * 11) + (problem * 10) + (project_skill * 7) + (cgpa * 3))|round|int, 100]|min %}
+        {% set analyst = [((problem * 11) + (cgpa * 4) + (communication * 6) + 18)|round|int, 100]|min %}
+        {% set trainee = [((technical * 0.35) + (comm_score * 0.2) + (cgpa * 4) + (consistency * 0.15))|round|int,
+        100]|min %}
+
+        {% set placement_confidence = profile['placement_confidence'] or 0 %}
+        {% set interview_score = (((communication + teamwork + placement_confidence) / 15) * 100)|round|int %}
+        {% set interview_level = 'Excellent' if interview_score >= 80 else ('Good' if interview_score >= 60 else
+        ('Developing' if interview_score >= 40 else 'Needs Practice')) %}
+        {% set interview_advice = 'You are well prepared, keep taking mock interviews to stay sharp.' if
+        interview_score >= 80 else ('Solid base, add a few more mock interviews and group discussions.' if
+        interview_score >= 60 else ('Work on structured answers and practice explaining your projects out loud.' if
+        interview_score >= 40 else 'Start with basic mock interviews and daily communication practice.')) %}
+
+        {% set companies = [
+        {'name':'Google','icon':'🔍','min_cgpa':8.0,'no_backlog':true,'min_tech':80,'min_comm':70},
+        {'name':'Amazon','icon':'📦','min_cgpa':7.5,'no_backlog':true,'min_tech':70,'min_comm':60},
+        {'name':'Microsoft','icon':'🪟','min_cgpa':7.5,'no_backlog':true,'min_tech':75,'min_comm':65},
+        {'name':'Infosys','icon':'💠','min_cgpa':6.5,'no_backlog':true,'min_tech':40,'min_comm':40},
+        {'name':'TCS','icon':'🔷','min_cgpa':6.0,'no_backlog':true,'min_tech':35,'min_comm':35},
+        {'name':'Accenture','icon':'🟣','min_cgpa':6.5,'no_backlog':true,'min_tech':45,'min_comm':45}
+        ] %}
+
+        {% set action_items = [] %}
+        {% if technical < 55 %}{% set _=action_items.append({'title':'Practice DSA daily','desc':'Start with arrays,
+            strings, functions and basic SQL.','priority':'High','rank':1}) %}{% endif %} {% if projects < 55 %}{% set
+            _=action_items.append({'title':'Complete one strong project','desc':'Make it presentable with screenshots
+            and GitHub documentation.','priority':'Medium','rank':2}) %}{% endif %} {% if comm_score < 60 %}{% set
+            _=action_items.append({'title':'Practice project explanation','desc':'Explain problem, solution, tech stack
+            and your contribution clearly.','priority':'Medium','rank':2}) %}{% endif %} {% set all_good=technical>= 55
+            and projects >= 55 and comm_score >= 60 %}
+            {% if not all_good %}{% set _ = action_items.append({'title':'Apply with tracking','desc':'Maintain a list
+            of
+            companies, roles, dates and application status.','priority':'Low','rank':3}) %}{% endif %}
+            {% set action_items = action_items|sort(attribute='rank') %}
+
+            {% set practice_resources = [] %}
+            {% if technical >= 55 %}
+            {% set _ = practice_resources.append({'name':'LeetCode','url':'https://leetcode.com/','desc':'Advanced
+            coding
+            practice and contest-style problems.'}) %}
+            {% set _ =
+            practice_resources.append({'name':'Codeforces','url':'https://codeforces.com/','desc':'Competitive
+            programming to sharpen problem solving.'}) %}
+            {% set _ =
+            practice_resources.append({'name':'InterviewBit','url':'https://www.interviewbit.com/','desc':'Structured
+            interview-style coding preparation.'}) %}
+            {% else %}
+            {% set _ =
+            practice_resources.append({'name':'GeeksforGeeks','url':'https://www.geeksforgeeks.org/','desc':'DSA
+            basics, CS subjects and interview preparation.'}) %}
+            {% set _ =
+            practice_resources.append({'name':'HackerRank','url':'https://www.hackerrank.com/','desc':'Beginner-friendly
+            coding tests and practice.'}) %}
+            {% set _ =
+            practice_resources.append({'name':'W3Schools','url':'https://www.w3schools.com/','desc':'Fundamentals
+            of programming languages and web basics.'}) %}
+            {% endif %}
+            {% if comm_score < 60 %} {% set
+                _=practice_resources.append({'name':'Toastmasters','url':'https://www.toastmasters.org/','desc':'Public
+                speaking and communication practice.'}) %} {% set _=practice_resources.append({'name':'Coursera
+                Communication Courses','url':'https://www.coursera.org/courses?query=communication','desc':'Structured
+                courses to improve workplace communication.'}) %} {% endif %} {% set areas=[ {'name':'Technical
+                Skill','score':technical}, {'name':'Project Portfolio','score':projects},
+                {'name':'Communication','score':comm_score}, {'name':'Academics (CGPA)','score':((cgpa / 10 *
+                100)|round|int)} ] %} {% set strongest=(areas|sort(attribute='score' ,reverse=true))[0] %} {% set
+                weakest=(areas|sort(attribute='score' ))[0] %} {% set strength_label='Strong' if eligibility>= 3 else
+                ('Moderate' if eligibility == 2 else 'Needs Work') %}
+                {% set risk_text = ('Active backlog may block shortlisting in many companies.' if has_backlog else
+                (weakest.name ~ ' may affect interview performance.' if weakest.score < 45 else 'No major risk right now, stay
+        consistent with practice.' )) %} <section class="layout">
+                    <div class="panel">
+                        <div class="panel-head">
+                            <div>
+                                <div class="panel-title">Current Placement Stage</div>
+                                <div class="panel-sub">Where you stand right now, and the basics that back it up</div>
+                            </div>
+                            {% if pr >= 75 %}<span class="status-pill pill-ready">Ready</span>{% elif pr >= 50 %}<span
+                                class="status-pill pill-progress">Preparing</span>{% else %}<span
+                                class="status-pill pill-start">Needs Foundation</span>{% endif %}
+                        </div>
+                        <div class="readiness-box">
+                            <div class="readiness-hero-top">
+                                <div class="circular-progress" style="--pct: {{ pr }}%;">
+                                    <div class="circular-progress-inner">
+                                        <div class="circular-progress-value">{{ pr }}%</div>
+                                        <div class="circular-progress-label">Readiness</div>
+                                    </div>
+                                </div>
+                                <p class="plain-note">Your readiness score blends academics, technical skill, projects
+                                    and
+                                    communication into one number so you always know where you stand.</p>
+                            </div>
+                            <div class="focus-card">
+                                <div class="focus-label">Main focus for you</div>
+                                <div class="focus-text">
+                                    {% if technical < 55 %}Improve coding, problem solving and core technical topics
+                                        first. {% elif projects < 55 %}Make your project portfolio stronger and
+                                        resume-ready. {% elif comm_score < 60 %}Practice explaining your projects and
+                                        answers clearly. {% elif not cgpa_ok %}Protect academics and try to raise CGPA
+                                        above common company criteria. {% else %}Start mock interviews and keep applying
+                                        consistently.{% endif %} </div>
+                                </div>
+                                <div class="check-list">
+                                    <div class="check-row">
+                                        <div class="check-icon {{ 'ok' if cgpa_ok else 'warn' }}">{{ '✓' if cgpa_ok else
+                                            '!' }}
+                                        </div>
+                                        <div>
+                                            <div class="check-title">CGPA above common cutoff</div>
+                                            <div class="check-desc">Many companies ask for 7.0 CGPA or above.</div>
+                                        </div><span class="tag">{{ cgpa }}</span>
+                                    </div>
+                                    <div class="check-row">
+                                        <div class="check-icon {{ 'ok' if backlog_ok else 'bad' }}">{{ '✓' if backlog_ok
+                                            else '!' }}
+                                        </div>
+                                        <div>
+                                            <div class="check-title">No active backlog</div>
+                                            <div class="check-desc">Backlogs can affect shortlisting in campus drives.
+                                            </div>
+                                        </div><span class="tag">{{ 'Clear' if backlog_ok else 'Pending' }}</span>
+                                    </div>
+                                    <div class="check-row">
+                                        <div class="check-icon {{ 'ok' if projects_ok else 'warn' }}">{{ '✓' if
+                                            projects_ok else '!'
+                                            }}</div>
+                                        <div>
+                                            <div class="check-title">Project portfolio</div>
+                                            <div class="check-desc">At least 1-2 explainable projects should be ready.
+                                            </div>
+                                        </div><span class="tag">{{ profile['projects_completed'] or '0' }}</span>
+                                    </div>
+                                    <div class="check-row">
+                                        <div class="check-icon {{ 'ok' if skills_ok else 'warn' }}">{{ '✓' if skills_ok
+                                            else '!' }}
+                                        </div>
+                                        <div>
+                                            <div class="check-title">Technical base</div>
+                                            <div class="check-desc">Coding, problem solving and project skill combined.
+                                            </div>
+                                        </div><span class="tag">{{ technical }}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div>
+                                    <div class="panel-title">Dream Company Eligibility</div>
+                                    <div class="panel-sub">{{ eligibility }}/4 basics met · checked against CGPA,
+                                        backlog,
+                                        technical and communication score</div>
+                                </div>
+                            </div>
+                            <div class="company-grid">
+                                {% for c in companies %}
+                                {% set fails = [] %}
+                                {% if cgpa < c.min_cgpa %}{% set _=fails.append('CGPA below ' ~ c.min_cgpa) %}{% endif %}
+                    {% if c.no_backlog and has_backlog %}{% set _ = fails.append(' Active backlog') %}{% endif %} {% if
+                                    technical < c.min_tech %}{% set _=fails.append('Technical score below ' ~ c.min_tech ~
+                    ' %') %}{% endif %} {% if comm_score < c.min_comm %}{% set _=fails.append('Communication below ' ~ c.min_comm ~
+                    ' %') %}{% endif %} {% set fail_count=fails|length %} <div class="company-card">
+                                    <div class="company-card-head">
+                                        <span class="company-icon">{{ c.icon }}</span>
+                                        <b>{{ c.name }}</b>
+                                        {% if fail_count == 0 %}
+                                        <span class="eligibility-badge badge-yes">Eligible</span>
+                                        {% elif fail_count == 1 %}
+                                        <span class="eligibility-badge badge-partial">Partially Eligible</span>
+                                        {% else %}
+                                        <span class="eligibility-badge badge-no">Not Eligible</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if fails %}
+                                    <span class="company-reason">{{ fails|join(', ') }}</span>
+                                    {% else %}
+                                    <span class="company-reason ok-reason">Meets all current criteria.</span>
+                                    {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    </section>
+
+                    <section class="layout-reverse">
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div>
+                                    <div class="panel-title">Recommended Role Direction</div>
+                                    <div class="panel-sub">Based on your current profile</div>
+                                </div>
+                            </div>
+                            <div class="role-list">
+                                <div class="role-card"><b>Software Engineer Trainee</b><span>Good for balanced coding,
+                                        academics and
+                                        communication.</span>
+                                    <div class="role-score">Match: {{ trainee }}%</div>
+                                    <div class="role-bar-track"><span class="role-bar-fill"
+                                            data-target="{{ trainee }}%"></span></div>
+                                </div>
+                                <div class="role-card"><b>Frontend Developer</b><span>Good if projects, UI work and
+                                        communication
+                                        are strong.</span>
+                                    <div class="role-score">Match: {{ frontend }}%</div>
+                                    <div class="role-bar-track"><span class="role-bar-fill"
+                                            data-target="{{ frontend }}%"></span></div>
+                                </div>
+                                <div class="role-card"><b>Backend Developer</b><span>Good if coding logic, databases and
+                                        problem
+                                        solving are strong.</span>
+                                    <div class="role-score">Match: {{ backend }}%</div>
+                                    <div class="role-bar-track"><span class="role-bar-fill"
+                                            data-target="{{ backend }}%"></span></div>
+                                </div>
+                                <div class="role-card"><b>Data Analyst Intern</b><span>Good if aptitude, problem solving
+                                        and
+                                        communication are decent.</span>
+                                    <div class="role-score">Match: {{ analyst }}%</div>
+                                    <div class="role-bar-track"><span class="role-bar-fill"
+                                            data-target="{{ analyst }}%"></span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div>
+                                    <div class="panel-title">Interview Readiness & Insights</div>
+                                    <div class="panel-sub">From communication, teamwork and your overall profile</div>
+                                </div>
+                            </div>
+                            <div class="role-bar-track"><span class="role-bar-fill"
+                                    data-target="{{ interview_score }}%"></span>
+                            </div>
+                            <div class="interview-meter-info">
+                                <span class="interview-score">{{ interview_score }}%</span>
+                                <span
+                                    class="status-pill {{ 'pill-ready' if interview_score >= 75 else ('pill-progress' if interview_score >= 50 else 'pill-start') }}">{{
+                                    interview_level }}</span>
+                            </div>
+                            <p class="plain-note" style="margin-top:8px;margin-bottom:12px">{{ interview_advice }}</p>
+                            <div class="insight-grid">
+                                <div class="insight-item">
+                                    <div class="focus-label">Strongest Area</div>
+                                    <div class="focus-text">{{ strongest.name }} ({{ strongest.score }}%)</div>
+                                </div>
+                                <div class="insight-item">
+                                    <div class="focus-label">Weakest Area</div>
+                                    <div class="focus-text">{{ weakest.name }} ({{ weakest.score }}%)</div>
+                                </div>
+                                <div class="insight-item">
+                                    <div class="focus-label">Placement Strength</div>
+                                    <div class="focus-text">{{ strength_label }}</div>
+                                </div>
+                                <div class="insight-item">
+                                    <div class="focus-label">Biggest Risk</div>
+                                    <div class="focus-text">{{ risk_text }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="layout-reverse">
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div>
+                                    <div class="panel-title">Your Placement Roadmap</div>
+                                    <div class="panel-sub">Priority-ordered next steps for you</div>
+                                </div>
+                            </div>
+                            {% if all_good %}
+                            <div class="focus-card">
+                                <div class="focus-label">You're on track</div>
+                                <div class="focus-text">Focus on mock interviews, applications, networking, and
+                                    consistency.</div>
+                            </div>
+                            {% else %}
+                            <div class="roadmap">
+                                {% for item in action_items %}
+                                <div class="road-step">
+                                    <div class="road-num">{{ loop.index }}</div>
+                                    <div>
+                                        <div class="road-title-row">
+                                            <div class="road-title">{{ item.title }}</div>
+                                            <span class="priority-badge priority-{{ item.priority|lower }}">{{
+                                                item.priority }}
+                                                Priority</span>
+                                        </div>
+                                        <div class="road-desc">{{ item.desc }}</div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div>
+                                    <div class="panel-title">Interview Preparation</div>
+                                    <div class="panel-sub">What each round expects from you</div>
+                                </div>
+                            </div>
+                            <div class="prep-list">
+                                <div class="prep-card"><b>Coding Round</b><span>DSA basics, time complexity, arrays,
+                                        strings and
+                                        simple problem solving.</span></div>
+                                <div class="prep-card"><b>Technical Round</b><span>Core subjects, projects, database
+                                        basics and
+                                        language fundamentals.</span></div>
+                                <div class="prep-card"><b>Aptitude Round</b><span>Quantitative aptitude, logical
+                                        reasoning and
+                                        verbal ability practice.</span></div>
+                                <div class="prep-card"><b>HR Round</b><span>Confidence, communication, career goal and
+                                        honest
+                                        project explanation.</span></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="layout">
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div>
+                                    <div class="panel-title">Resume Checklist</div>
+                                    <div class="panel-sub">Keep these things ready before applying</div>
+                                </div>
+                            </div>
+                            <div class="resume-grid">
+                                <div class="resume-card"><b>Project Details</b><span>Problem statement, tech stack,
+                                        features,
+                                        screenshots and GitHub link.</span></div>
+                                <div class="resume-card"><b>Skills Section</b><span>Add only those skills that you can
+                                        explain
+                                        confidently.</span></div>
+                                <div class="resume-card"><b>Profile Links</b><span>LinkedIn, GitHub, portfolio and
+                                        coding platform
+                                        links if available.</span></div>
+                                <div class="resume-card"><b>Achievements</b><span>Certificates, training, hackathons,
+                                        workshops and
+                                        academic achievements.</span></div>
+                            </div>
+                        </div>
+
+                        <div class="panel">
+                            <div class="panel-head">
+                                <div>
+                                    <div class="panel-title">Resources & Practice Links</div>
+                                    <div class="panel-sub">Job search plus practice picked for your current level</div>
+                                </div>
+                            </div>
+                            <div class="resource-list">
+                                <div class="resource-card"><b><a href="https://www.linkedin.com/"
+                                            target="_blank">LinkedIn</a></b><span>Networking, job search and profile
+                                        building.</span></div>
+                                <div class="resource-card"><b><a href="https://www.naukri.com/"
+                                            target="_blank">Naukri</a></b><span>Fresher jobs and company
+                                        applications.</span></div>
+                                <div class="resource-card"><b><a href="https://internshala.com/"
+                                            target="_blank">Internshala</a></b><span>Internships, training and beginner
+                                        opportunities.</span></div>
+                                {% for r in practice_resources %}
+                                <div class="resource-card"><b><a href="{{ r.url }}" target="_blank">{{ r.name
+                                            }}</a></b><span>{{
+                                        r.desc }}</span></div>
+                                {% endfor %}
+                                <div class="resource-card"><b><a href="https://resumeworded.com/" target="_blank">Resume
+                                            Worded</a></b><span>Resume feedback and profile improvement.</span></div>
+                            </div>
+                        </div>
+                    </section>
+                    {% else %}
+                    <div class="empty">
+                        <h2>Complete your profile first</h2>
+                        <p>Placement guidance needs your CGPA, skills, projects and readiness details.</p>
+                    </div>
+                    {% endif %}
+    </main>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            body.setAttribute('data-theme', body.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+            localStorage.setItem('ssip-theme', body.getAttribute('data-theme'));
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            document.body.setAttribute('data-theme', localStorage.getItem('ssip-theme') || 'dark');
+            const bars = document.querySelectorAll('.role-bar-fill[data-target]');
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    bars.forEach(bar => {
+                        bar.style.width = bar.getAttribute('data-target');
+                    });
+                }, 150);
+            });
+        });
+    </script>
+</body>
+
+</html>

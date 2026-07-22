@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSIP — Create Account</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080810;
+            --surface: #0E0C1A;
+            --surface2: #13101F;
+            --border: rgba(255, 255, 255, 0.07);
+            --crimson: #DC2626;
+            --violet: #7C3AED;
+            --text: #F0EEFF;
+            --muted: #6B6A8A
+        }
+
+        [data-theme="light"] {
+            --bg: #F7F5FF;
+            --surface: #FFFFFF;
+            --surface2: #F0EEFF;
+            --border: rgba(124, 58, 237, 0.12);
+            --text: #0F0D1F;
+            --muted: #55536F
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            -webkit-font-smoothing: antialiased;
+            transition: background .3s, color .3s
+        }
+
+        .theme-btn {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 460px
+        }
+
+        .brand-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            padding-left: 2px
+        }
+
+        .brand-mark {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            color: white;
+            flex-shrink: 0
+        }
+
+        .brand-name {
+            font-family: 'Manrope', sans-serif;
+            font-size: 15px;
+            font-weight: 800
+        }
+
+        .brand-inst {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED)
+        }
+
+        h1 {
+            font-family: 'Manrope', sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 4px
+        }
+
+        .sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 22px
+        }
+
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: 12px
+        }
+
+        .section-label .n {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: #A78BFA;
+            font-size: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 20px 0
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            font-weight: 700;
+            margin-bottom: 6px
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 11px 13px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color .15s;
+            margin-bottom: 14px;
+            appearance: none
+        }
+
+        input:focus,
+        select:focus {
+            border-color: rgba(124, 58, 237, .55)
+        }
+
+        input::placeholder {
+            color: var(--muted)
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236B6A8A'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 13px center
+        }
+
+        select option {
+            background: var(--surface2);
+            color: var(--text)
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            border: none;
+            border-radius: 9px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity .15s;
+            margin-top: 4px
+        }
+
+        button:hover {
+            opacity: .9
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .link a {
+            color: #A78BFA;
+            text-decoration: none;
+            font-weight: 600
+        }
+
+        .link a:hover {
+            text-decoration: underline
+        }
+
+        .error {
+            background: rgba(220, 38, 38, .1);
+            border: 1px solid rgba(220, 38, 38, .3);
+            border-radius: 9px;
+            padding: 10px 13px;
+            font-size: 13px;
+            color: #F87171;
+            margin-bottom: 18px
+        }
+    </style>
+    <script>
+        (function () {
+            const theme = localStorage.getItem('ssip-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+    <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+
+    <div class="wrap">
+        <div class="brand-row">
+            <div class="brand-mark">S</div>
+            <div>
+                <div class="brand-name">SSIP</div>
+                <div class="brand-inst">MITSGWL Gwalior · Student Portal</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h1>Create your account</h1>
+            <div class="sub">You'll complete your student assessment right after this.</div>
+
+            {% if error %}
+            <div class="error">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST">
+
+                <div class="section-label"><span class="n">1</span> Personal Info</div>
+
+                <label>Full Name</label>
+                <input type="text" name="name" placeholder="Your Full Name" required>
+
+                <div class="row">
+                    <div>
+                        <label>Username</label>
+                        <input type="text" name="username" placeholder="Username" required>
+                    </div>
+                    <div>
+                        <label>College Email</label>
+                        <input type="email" name="email" placeholder="Email-ID" required>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+                <div class="section-label"><span class="n">2</span> Academic Info</div>
+
+                <div class="row">
+                    <div>
+                        <label>Branch</label>
+                        <select name="branch" required>
+                            <option value="">Select branch</option>
+                            <option value="AI">Centre for AI</option>
+                            <option value="CSE">CSE</option>
+                            <option value="IT">IT</option>
+                            <option value="AIML">AI &amp; ML</option>
+                            <option value="AIDS">AI &amp; Data Science</option>
+                            <option value="IOT">IoT</option>
+                            <option value="ECE">Electronics</option>
+                            <option value="MECH">Mechanical</option>
+                            <option value="CIVIL">Civil</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Semester</label>
+                        <select name="semester" required>
+                            <option value="">Select</option>
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                            <option value="3">Semester 3</option>
+                            <option value="4">Semester 4</option>
+                            <option value="5">Semester 5</option>
+                            <option value="6">Semester 6</option>
+                            <option value="7">Semester 7</option>
+                            <option value="8">Semester 8</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+                <div class="section-label"><span class="n">3</span> Security</div>
+
+                <div class="row">
+                    <div>
+                        <label>Password</label>
+                        <input type="password" name="password" placeholder="Min 6 characters" required minlength="6">
+                    </div>
+                    <div>
+                        <label>Confirm Password</label>
+                        <input type="password" name="confirm_password" placeholder="Repeat password" required>
+                    </div>
+                </div>
+
+                <button type="submit">Create Account</button>
+            </form>
+
+            <div class="link">
+                Already have an account? <a href="/login">Sign in</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const b = document.body;
+            b.setAttribute('data-theme', b.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+            localStorage.setItem('ssip-theme', b.getAttribute('data-theme'));
+        }
+        document.body.setAttribute('data-theme', localStorage.getItem('ssip-theme') || 'dark');
+    </script>
+</body>
+
+</html>

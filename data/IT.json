@@ -1,0 +1,112 @@
+{
+    "1": [
+        {
+            "name": "Emerging Technologies in Computer Science",
+            "credit": 3
+        },
+        {
+            "name": "Computer Programming",
+            "credit": 2
+        },
+        {
+            "name": "Digital Electronics",
+            "credit": 3
+        },
+        {
+            "name": "Cyber World and Security Concern",
+            "credit": 3
+        },
+        {
+            "name": "Engineering Mathematics-I",
+            "credit": 3
+        }
+    ],
+    "2": [
+        {
+            "name": "Computer Graphics",
+            "credit": 3
+        },
+        {
+            "name": "Object Oriented Programming & Methodology",
+            "credit": 3
+        },
+        {
+            "name": "Computer Science and Organization",
+            "credit": 3
+        },
+        {
+            "name": "Operating Systems",
+            "credit": 3
+        },
+        {
+            "name": "Basic Electrical & Electronics Engineering",
+            "credit": 2
+        }
+    ],
+    "3": [
+        {
+            "name": "Discrete Structures",
+            "credit": 4
+        },
+        {
+            "name": "Operating Systems",
+            "credit": 3
+        },
+        {
+            "name": "Design & Analysis of Algorithms",
+            "credit": 4
+        },
+        {
+            "name": "Database Management Sytem",
+            "credit": 4
+        },
+        {
+            "name": "Python Programming",
+            "credit": 3
+        }
+    ],
+    "4": [
+        {
+            "name": "Computer Networks",
+            "credit": 4
+        },
+        {
+            "name": "Software Engineering",
+            "credit": 3
+        },
+        {
+            "name": "Data Mining & Warehousing",
+            "credit": 4
+        },
+        {
+            "name": "Theory of Computation",
+            "credit": 3
+        },
+        {
+            "name": "Artificial Intelligence & Neural Network",
+            "credit": 3
+        }
+    ],
+    "5": [
+        {
+            "name": "Data Science",
+            "credit": 4
+        },
+        {
+            "name": "Networking with TCP/IP",
+            "credit": 3
+        },
+        {
+            "name": "Information Security",
+            "credit": 4
+        },
+        {
+            "name": "Compiler Design",
+            "credit": 4
+        },
+        {
+            "name": "Cloud Computing and Virtualization",
+            "credit": 3
+        }
+    ]
+}

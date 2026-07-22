@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSIP — AI Mentor</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080810;
+            --surface: #0E0C1A;
+            --surface2: #13101F;
+            --border: rgba(255, 255, 255, 0.07);
+            --crimson: #DC2626;
+            --violet: #7C3AED;
+            --text: #F0EEFF;
+            --muted: #6B6A8A
+        }
+
+        [data-theme="light"] {
+            --bg: #F7F5FF;
+            --surface: #FFFFFF;
+            --surface2: #F0EEFF;
+            --border: rgba(124, 58, 237, 0.12);
+            --text: #0F0D1F;
+            --muted: #55536F
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            -webkit-font-smoothing: antialiased;
+            transition: background .3s, color .3s
+        }
+
+        .sidebar {
+            width: 220px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 20;
+            overflow-y: auto
+        }
+
+        .sb-top {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .logo-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 1px;
+            letter-spacing: .05em
+        }
+
+        .nav {
+            padding: 0 10px
+        }
+
+        .nav-label {
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            padding: 8px 6px 3px
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 1px;
+            transition: all .15s
+        }
+
+        .nav-item:hover {
+            background: rgba(124, 58, 237, .1);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: rgba(220, 38, 38, .15);
+            color: #F87171
+        }
+
+        .sb-footer {
+            margin-top: auto;
+            padding: 12px 16px 0;
+            border-top: 1px solid var(--border)
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0
+        }
+
+        .u-name {
+            font-size: 12px;
+            font-weight: 600
+        }
+
+        .u-role {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .logout {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            color: #F87171;
+            font-size: 12px;
+            text-decoration: none;
+            margin-top: 6px;
+            font-weight: 500
+        }
+
+        .logout:hover {
+            background: rgba(248, 113, 113, .1)
+        }
+
+        /* MAIN LAYOUT */
+        .main {
+            margin-left: 220px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden
+        }
+
+        .topbar {
+            padding: 20px 28px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.03em
+        }
+
+        .page-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .theme-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px
+        }
+
+        /* CHAT LAYOUT */
+        .chat-wrap {
+            display: grid;
+            grid-template-columns: 1fr 260px;
+            flex: 1;
+            overflow: hidden
+        }
+
+        .chat-main {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 4px
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: rgba(124, 58, 237, .3);
+            border-radius: 99px
+        }
+
+        /* MESSAGES */
+        .msg {
+            display: flex;
+            gap: 10px;
+            max-width: 80%;
+            animation: fadeIn .3s ease
+        }
+
+        .msg.user {
+            align-self: flex-end;
+            flex-direction: row-reverse
+        }
+
+        .msg-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-top: 2px
+        }
+
+        .msg-avatar.ai {
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            color: white
+        }
+
+        .msg-avatar.user {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--muted)
+        }
+
+        .msg-bubble {
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            font-weight: 400
+        }
+
+        .msg.ai .msg-bubble {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px 12px 12px 12px;
+            color: var(--text)
+        }
+
+        .msg.user .msg-bubble {
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            color: white;
+            border-radius: 12px 4px 12px 12px
+        }
+
+        .msg-time {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 4px;
+            font-weight: 500
+        }
+
+        .msg.user .msg-time {
+            text-align: right
+        }
+
+        /* TYPING */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px 12px 12px 12px;
+            width: fit-content
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--muted);
+            animation: typing 1.2s infinite
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: .2s
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: .4s
+        }
+
+        @keyframes typing {
+
+            0%,
+            60%,
+            100% {
+                opacity: .3;
+                transform: translateY(0)
+            }
+
+            30% {
+                opacity: 1;
+                transform: translateY(-4px)
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* INPUT */
+        .input-area {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            flex-shrink: 0
+        }
+
+        .quick-prompts {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 10px
+        }
+
+        .qp {
+            padding: 5px 12px;
+            border-radius: 99px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all .15s;
+            font-weight: 500;
+            white-space: nowrap
+        }
+
+        .qp:hover {
+            border-color: rgba(220, 38, 38, .4);
+            color: #F87171
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 11px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+            max-height: 120px;
+            min-height: 44px;
+            transition: border-color .2s;
+            line-height: 1.5
+        }
+
+        .chat-input:focus {
+            border-color: rgba(220, 38, 38, .5)
+        }
+
+        .chat-input::placeholder {
+            color: var(--muted)
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: opacity .2s, transform .15s
+        }
+
+        .send-btn:hover {
+            opacity: .9;
+            transform: translateY(-1px)
+        }
+
+        .send-btn:disabled {
+            opacity: .4;
+            cursor: not-allowed;
+            transform: none
+        }
+
+        /* SIDEBAR RIGHT */
+        .chat-sidebar {
+            border-left: 1px solid var(--border);
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px
+        }
+
+        .chat-sidebar::-webkit-scrollbar {
+            width: 4px
+        }
+
+        .chat-sidebar::-webkit-scrollbar-thumb {
+            background: rgba(124, 58, 237, .2);
+            border-radius: 99px
+        }
+
+        .sidebar-sec {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 14px
+        }
+
+        .sidebar-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+            letter-spacing: -0.01em
+        }
+
+        .profile-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px
+        }
+
+        .profile-row:last-child {
+            border-bottom: none
+        }
+
+        .pr-label {
+            color: var(--muted);
+            font-weight: 500
+        }
+
+        .pr-val {
+            font-weight: 600
+        }
+
+        .pr-val.crimson {
+            color: #F87171
+        }
+
+        .pr-val.green {
+            color: #4ADE80
+        }
+
+        .pr-val.violet {
+            color: #A78BFA
+        }
+
+        .pr-val.amber {
+            color: #FBBF24
+        }
+
+        .topic-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 7px 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 5px;
+            transition: all .15s
+        }
+
+        .topic-btn:hover {
+            border-color: rgba(220, 38, 38, .3);
+            color: #F87171
+        }
+
+        .topic-btn:last-child {
+            margin-bottom: 0
+        }
+
+        .clear-btn {
+            width: 100%;
+            padding: 8px;
+            background: transparent;
+            border: 1px solid rgba(248, 113, 113, .3);
+            border-radius: 8px;
+            color: #F87171;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+            margin-top: 4px
+        }
+
+        .clear-btn:hover {
+            background: rgba(248, 113, 113, .1)
+        }
+
+        [data-theme="light"] .sidebar-sec {
+            background: #FFF;
+            border-color: rgba(124, 58, 237, .1)
+        }
+
+        [data-theme="light"] .msg.ai .msg-bubble {
+            background: #FFF;
+            border-color: rgba(124, 58, 237, .1)
+        }
+
+        [data-theme="light"] .chat-input {
+            background: #FFF;
+            border-color: rgba(124, 58, 237, .15);
+            color: #0F0D1F
+        }
+
+        [data-theme="light"] .qp {
+            background: #FFF;
+            border-color: rgba(124, 58, 237, .1)
+        }
+
+        [data-theme="light"] .topic-btn {
+            background: #F7F5FF;
+            border-color: rgba(124, 58, 237, .08)
+        }
+
+        [data-theme="light"] .typing-indicator {
+            background: #FFF;
+            border-color: rgba(124, 58, 237, .1)
+        }
+
+        /* MENTOR MODE SELECT */
+        .mode-select-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .mode-select {
+            padding: 7px 12px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none
+        }
+
+        /* FOLLOW-UPS */
+        .followup-block {
+            margin-top: 8px;
+            padding: 10px 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            max-width: fit-content
+        }
+
+        .followup-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 6px;
+            letter-spacing: .02em
+        }
+
+        .followup-btn {
+            display: inline-block;
+            padding: 6px 12px;
+            margin: 3px 4px 0 0;
+            border-radius: 99px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: all .15s
+        }
+
+        .followup-btn:hover {
+            border-color: rgba(124, 58, 237, .5);
+            color: #A78BFA
+        }
+
+        /* RESOURCE CARDS */
+        .resource-block {
+            margin-top: 8px;
+            max-width: fit-content
+        }
+
+        .resource-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 6px
+        }
+
+        .resource-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px
+        }
+
+        .resource-card {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 12px;
+            border-radius: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            text-decoration: none;
+            transition: all .15s
+        }
+
+        .resource-card:hover {
+            border-color: rgba(220, 38, 38, .4);
+            color: #F87171
+        }
+
+        /* ACTION BUTTON */
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            border: none;
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            width: fit-content;
+            transition: opacity .2s, transform .15s
+        }
+
+        .action-btn:hover {
+            opacity: .9;
+            transform: translateY(-1px)
+        }
+
+        /* RATING */
+        .rate-block {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px
+        }
+
+        .rate-btn {
+            padding: 4px 9px;
+            border-radius: 7px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            cursor: pointer;
+            color: var(--muted);
+            transition: all .15s
+        }
+
+        .rate-btn:hover {
+            border-color: rgba(124, 58, 237, .4)
+        }
+
+        .rate-btn.selected {
+            background: rgba(124, 58, 237, .15);
+            border-color: rgba(124, 58, 237, .5);
+            color: #A78BFA
+        }
+
+        /* MIC BUTTON */
+        .mic-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: all .15s
+        }
+
+        .mic-btn:hover {
+            border-color: rgba(220, 38, 38, .4);
+            color: #F87171
+        }
+
+        .mic-btn.recording {
+            background: rgba(220, 38, 38, .15);
+            border-color: rgba(220, 38, 38, .5);
+            color: #F87171;
+            animation: pulse-mic 1s infinite
+        }
+
+        @keyframes pulse-mic {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .5
+            }
+        }
+
+        /* ANALYZE PROFILE BUTTON */
+        .analyze-btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(220, 38, 38, .15), rgba(124, 58, 237, .15));
+            border: 1px solid rgba(124, 58, 237, .35);
+            color: var(--text);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .15s;
+            margin-bottom: 4px
+        }
+
+        .analyze-btn:hover {
+            border-color: rgba(124, 58, 237, .6);
+            transform: translateY(-1px)
+        }
+
+        /* CONVERSATION MEMORY */
+        .new-chat-btn {
+            width: 100%;
+            padding: 7px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px dashed var(--border);
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: all .15s
+        }
+
+        .new-chat-btn:hover {
+            border-color: rgba(124, 58, 237, .4);
+            color: #A78BFA
+        }
+
+        .topic-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            width: 100%;
+            text-align: left;
+            padding: 7px 9px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 5px;
+            transition: all .15s;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis
+        }
+
+        .topic-item:hover {
+            border-color: rgba(220, 38, 38, .3);
+            color: #F87171
+        }
+
+        .topic-item.active-conv {
+            border-color: rgba(124, 58, 237, .5);
+            color: #A78BFA;
+            background: rgba(124, 58, 237, .1)
+        }
+
+        .empty-topics {
+            font-size: 11px;
+            color: var(--muted);
+            font-style: italic;
+            padding: 4px 2px
+        }
+
+        [data-theme="light"] .followup-block,
+        [data-theme="light"] .mode-select,
+        [data-theme="light"] .new-chat-btn,
+        [data-theme="light"] .topic-item,
+        [data-theme="light"] .rate-btn,
+        [data-theme="light"] .mic-btn {
+            background: #FFF;
+            border-color: rgba(124, 58, 237, .1)
+        }
+
+        [data-theme="light"] .followup-btn,
+        [data-theme="light"] .resource-card {
+            background: #F7F5FF;
+            border-color: rgba(124, 58, 237, .12)
+        }
+    </style>
+    <script>
+        (function () {
+            const theme = localStorage.getItem('ssip-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+
+    <nav class="sidebar">
+        <div class="sb-top">
+            <div class="logo">SSIP</div>
+            <div class="logo-sub">Intelligence Platform</div>
+        </div>
+        <div class="nav">
+            <div class="nav-label">Main</div>
+            <a href="/" class="nav-item">🏠 Dashboard</a>
+            <a href="/profile" class="nav-item">👤 Profile</a>
+            <a href="/analytics" class="nav-item">📊 Analytics</a>
+            <div class="nav-label">AI Features</div>
+            <a href="/ai-mentor" class="nav-item active">🤖 AI Mentor</a>
+            <a href="/study-planner" class="nav-item">📅 Study Planner</a>
+            <a href="/placement" class="nav-item">🏆 Placement</a>
+            <a href="/career" class="nav-item">🎯 Career Path</a>
+            <div class="nav-label">Tools</div>
+            <a href="/skills" class="nav-item">⚡ Skills</a>
+            <a href="/reports" class="nav-item">📄 Reports</a>
+        </div>
+        <div class="sb-footer">
+            <div class="user-row">
+                <div class="avatar">{{ session['user'][0].upper() }}</div>
+                <div>
+                    <div class="u-name">{{ session.get('user_name', session['user']).split()[0] }}</div>
+                    <div class="u-role">Student · MITSGWL</div>
+                </div>
+            </div>
+            <a href="/logout" class="logout">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <div class="page-title">🤖 AI Mentor</div>
+                <div class="page-sub" id="pageSub">Powered by Gemini — personalized guidance based on your profile</div>
+            </div>
+            <div class="mode-select-wrap">
+                <select class="mode-select" id="mentorMode" onchange="changeMentorMode()">
+                    <option value="academic">🎓 Academic Mentor</option>
+                    <option value="placement">💼 Placement Mentor</option>
+                    <option value="ai_career">🤖 AI Career Mentor</option>
+                    <option value="study">📚 Study Mentor</option>
+                </select>
+                <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+            </div>
+        </div>
+
+        <div class="chat-wrap">
+            <div class="chat-main">
+                <div class="messages" id="messages">
+                    <div class="msg ai">
+                        <div class="msg-avatar ai">AI</div>
+                        <div>
+                            <div class="msg-bubble">
+                                Hi {{ session.get('user_name', 'there').split()[0] }}! 👋 I'm your AI Mentor, and I know
+                                your profile well.<br><br>
+                                {% if profile %}
+                                You have a <strong>CGPA of {{ profile['cgpa'] }}</strong>, your attendance is <strong>{{
+                                    profile['attendance'] }}</strong>, and your career goal is <strong>{{
+                                    profile['career_goal'] }}</strong>.<br><br>
+                                Your success score is <strong>{{ profile['success_score'] }}/100</strong> and placement
+                                readiness is <strong>{{ profile['placement_readiness'] }}%</strong>.<br><br>
+                                I can help you with study plans, weak subjects, DSA practice, career guidance, or
+                                anything academic. What would you like to work on today?
+                                {% else %}
+                                I'm ready to help you with academics, career guidance, study planning, and more. What's
+                                on your mind today?
+                                {% endif %}
+                            </div>
+                            <div class="msg-time">Just now</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-area">
+                    <div class="quick-prompts">
+                        <div class="qp" onclick="sendQuick(this)">How can I improve my CGPA?</div>
+                        <div class="qp" onclick="sendQuick(this)">Make me a study plan</div>
+                        <div class="qp" onclick="sendQuick(this)">How to improve DSA?</div>
+                        <div class="qp" onclick="sendQuick(this)">Am I placement ready?</div>
+                        <div class="qp" onclick="sendQuick(this)">Which career path suits me?</div>
+                    </div>
+                    <div class="input-row">
+                        <textarea class="chat-input" id="chatInput"
+                            placeholder="Ask anything about your academics, career, or study plans..."
+                            rows="1"></textarea>
+                        <button class="mic-btn" id="micBtn" onclick="toggleVoiceInput()" title="Voice input">🎤</button>
+                        <button class="send-btn" id="sendBtn" onclick="sendMessage()">➤</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT SIDEBAR -->
+            <div class="chat-sidebar">
+                <div class="sidebar-sec">
+                    <div class="sidebar-title">Conversation Memory</div>
+                    <button class="new-chat-btn" onclick="startNewConversation()">＋ New Chat</button>
+                    <div id="recentTopics">
+                        <div class="empty-topics">No past conversations yet</div>
+                    </div>
+                </div>
+
+                {% if profile %}
+                <div class="sidebar-sec">
+                    <button class="analyze-btn" onclick="analyzeProfile()">🔍 Analyze My Profile</button>
+                </div>
+
+                <div class="sidebar-sec">
+                    <div class="sidebar-title">Your Profile Snapshot</div>
+                    <div class="profile-row"><span class="pr-label">CGPA</span><span class="pr-val amber">{{
+                            profile['cgpa'] }}</span></div>
+                    <div class="profile-row"><span class="pr-label">Attendance</span><span class="pr-val green">{{
+                            profile['attendance'] }}</span></div>
+                    <div class="profile-row"><span class="pr-label">Success Score</span><span class="pr-val crimson">{{
+                            profile['success_score'] }}/100</span></div>
+                    <div class="profile-row"><span class="pr-label">Placement</span><span class="pr-val violet">{{
+                            profile['placement_readiness'] }}%</span></div>
+                    <div class="profile-row"><span class="pr-label">Risk</span><span
+                            class="pr-val {% if profile['academic_risk']=='Low' %}green{% elif profile['academic_risk']=='Medium' %}amber{% else %}crimson{% endif %}">{{
+                            profile['academic_risk'] }}</span></div>
+                    <div class="profile-row"><span class="pr-label">Persona</span><span class="pr-val"
+                            style="font-size:11px">{{ profile['persona'] }}</span></div>
+                </div>
+                {% endif %}
+
+                <div class="sidebar-sec">
+                    <div class="sidebar-title">Topic Shortcuts</div>
+                    <button class="topic-btn" onclick="sendQuick(this)">📚 Weak subject help</button>
+                    <button class="topic-btn" onclick="sendQuick(this)">💻 DSA roadmap for beginners</button>
+                    <button class="topic-btn" onclick="sendQuick(this)">🚀 Project ideas for AI students</button>
+                    <button class="topic-btn" onclick="sendQuick(this)">🎯 Internship preparation tips</button>
+                    <button class="topic-btn" onclick="sendQuick(this)">📅 30 day study plan</button>
+                    <button class="topic-btn" onclick="sendQuick(this)">🏆 How to crack placement interviews</button>
+                </div>
+
+                <div class="sidebar-sec">
+                    <div class="sidebar-title">Session</div>
+                    <button class="clear-btn" onclick="clearChat()">🗑 Clear conversation</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Profile context for AI
+        const profileContext = `{{ profile['cgpa'] if profile and profile['cgpa'] else 'unknown' }}`;
+        const profileData = {{ profile | tojson if profile else 'null' }};
+        const studentName = "{{ session.get('user_name', 'Student').split()[0] }}";
+
+        let conversationHistory = [];
+
+        // ---- Mentor Modes ----
+        const mentorModes = {
+            academic: { label: '🎓 Academic Mentor', sub: 'Focused on CGPA, subjects & academic performance' },
+            placement: { label: '💼 Placement Mentor', sub: 'Focused on interview prep & job readiness' },
+            ai_career: { label: '🤖 AI Career Mentor', sub: 'Focused on AI/ML career paths & industry trends' },
+            study: { label: '📚 Study Mentor', sub: 'Focused on study plans & learning strategy' }
+        };
+
+        function changeMentorMode() {
+            const mode = document.getElementById('mentorMode').value;
+            localStorage.setItem('ssip-mentor-mode', mode);
+            document.getElementById('pageSub').textContent = mentorModes[mode].sub + ' — Powered by Gemini';
+        }
+
+        // ---- Conversation Memory ----
+        let conversations = [];
+        let currentConvId = null;
+
+        function convKey() {
+            return 'ssip-conversations-' + studentName;
+        }
+
+        function loadConversationsFromStorage() {
+            try {
+                conversations = JSON.parse(localStorage.getItem(convKey())) || [];
+            } catch (e) {
+                conversations = [];
+            }
+            renderRecentTopics();
+        }
+
+        function renderRecentTopics() {
+            const wrap = document.getElementById('recentTopics');
+            if (!conversations.length) {
+                wrap.innerHTML = '<div class="empty-topics">No past conversations yet</div>';
+                return;
+            }
+            wrap.innerHTML = conversations.slice().reverse().map(c => `
+        <button class="topic-item ${c.id === currentConvId ? 'active-conv' : ''}" onclick="loadConversation('${c.id}')">
+          💬 ${c.title}
+        </button>
+      `).join('');
+        }
+
+        function deriveTitle(text) {
+            const clean = text.replace(/[^\w\s?]/g, '').trim();
+            return clean.length > 32 ? clean.slice(0, 32) + '…' : clean;
+        }
+
+        function saveCurrentConversation() {
+            if (!conversationHistory.length) return;
+            const firstUserMsg = conversationHistory.find(m => m.role === 'user');
+            if (!firstUserMsg) return;
+            const title = deriveTitle(firstUserMsg.content);
+
+            let conv = conversations.find(c => c.id === currentConvId);
+            if (!conv) {
+                currentConvId = 'conv_' + Date.now();
+                conv = { id: currentConvId, title, history: conversationHistory };
+                conversations.push(conv);
+            } else {
+                conv.title = title;
+                conv.history = conversationHistory;
+            }
+            localStorage.setItem(convKey(), JSON.stringify(conversations));
+            renderRecentTopics();
+        }
+
+        function loadConversation(id) {
+            const conv = conversations.find(c => c.id === id);
+            if (!conv) return;
+            currentConvId = id;
+            conversationHistory = conv.history.slice();
+
+            const messages = document.getElementById('messages');
+            messages.innerHTML = '';
+            conversationHistory.forEach(m => {
+                addMessage(m.role === 'assistant' ? 'ai' : 'user', m.content, false);
+            });
+            renderRecentTopics();
+        }
+
+        function startNewConversation() {
+            saveCurrentConversation();
+            currentConvId = null;
+            conversationHistory = [];
+            const messages = document.getElementById('messages');
+            messages.innerHTML = `
+        <div class="msg ai">
+          <div class="msg-avatar ai">AI</div>
+          <div>
+            <div class="msg-bubble">Hi ${studentName}! 👋 Starting a fresh conversation. What would you like to work on today?</div>
+            <div class="msg-time">Just now</div>
+          </div>
+        </div>
+      `;
+            renderRecentTopics();
+        }
+
+        function toggleTheme() {
+            const b = document.body;
+            b.setAttribute('data-theme', b.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+            localStorage.setItem('ssip-theme', b.getAttribute('data-theme'));
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            document.body.setAttribute('data-theme', localStorage.getItem('ssip-theme') || 'dark');
+            const savedMode = localStorage.getItem('ssip-mentor-mode') || 'academic';
+            document.getElementById('mentorMode').value = savedMode;
+            document.getElementById('pageSub').textContent = mentorModes[savedMode].sub + ' — Powered by Gemini';
+            loadConversationsFromStorage();
+        });
+
+        // Auto resize textarea
+        const input = document.getElementById('chatInput');
+        input.addEventListener('input', () => {
+            input.style.height = 'auto';
+            input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+        });
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function sendQuick(el) {
+            input.value = el.textContent.replace(/^[^\w]*/, '').trim();
+            sendMessage();
+        }
+
+        function getTime() {
+            return new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // ---- Resource map for Resource Cards feature ----
+        const resourceMap = [
+            {
+                keys: ['dsa', 'data structure', 'algorithm', 'coding practice'], resources: [
+                    { name: '💻 Leetcode', url: 'https://leetcode.com' },
+                    { name: '📗 GeeksForGeeks', url: 'https://www.geeksforgeeks.org' },
+                    { name: '🎯 Neetcode', url: 'https://neetcode.io' }
+                ]
+            },
+            {
+                keys: ['interview', 'placement', 'job', 'resume'], resources: [
+                    { name: '💼 Naukri', url: 'https://www.naukri.com' },
+                    { name: '🔗 LinkedIn', url: 'https://www.linkedin.com' },
+                    { name: '📄 Resume Worded', url: 'https://resumeworded.com' }
+                ]
+            },
+            {
+                keys: ['study plan', 'study', 'exam', 'cgpa', 'subject'], resources: [
+                    { name: '🎓 Khan Academy', url: 'https://www.khanacademy.org' },
+                    { name: '📘 NPTEL', url: 'https://nptel.ac.in' }
+                ]
+            },
+            {
+                keys: ['project', 'portfolio', 'github'], resources: [
+                    { name: '🐙 GitHub', url: 'https://github.com' },
+                    { name: '🚀 DevPost', url: 'https://devpost.com' }
+                ]
+            },
+            {
+                keys: ['ai', 'machine learning', 'ml', 'career'], resources: [
+                    { name: '🧠 Coursera', url: 'https://www.coursera.org' },
+                    { name: '📊 Kaggle', url: 'https://www.kaggle.com' }
+                ]
+            }
+        ];
+
+        function getResourcesForText(text) {
+            const lower = text.toLowerCase();
+            for (const entry of resourceMap) {
+                if (entry.keys.some(k => lower.includes(k))) return entry.resources;
+            }
+            return null;
+        }
+
+        // ---- Follow-up suggestions ----
+        const followupMap = [
+            { keys: ['placement', 'interview', 'job'], suggestions: ['Make a 30-day placement plan', 'What questions are usually asked?', 'How to improve my resume?'] },
+            { keys: ['dsa', 'data structure', 'algorithm'], suggestions: ['Explain a DSA roadmap', 'Give me practice problems', 'How much time per day for DSA?'] },
+            { keys: ['study plan', 'study', 'cgpa', 'exam'], suggestions: ['Make a 30-day study plan', 'Which subjects should I prioritize?', 'How to improve my CGPA?'] },
+            { keys: ['career', 'ai', 'machine learning'], suggestions: ['Give project ideas', 'Which career path suits me?', 'What skills should I learn first?'] },
+            { keys: ['project'], suggestions: ['Give more project ideas', 'How to showcase this on my resume?', 'Suggest a tech stack'] }
+        ];
+
+        function getFollowups(userText) {
+            const lower = userText.toLowerCase();
+            for (const entry of followupMap) {
+                if (entry.keys.some(k => lower.includes(k))) return entry.suggestions;
+            }
+            return ['Can you explain more?', 'Make a 30-day plan', 'Give project ideas', 'Improve my coding skills'];
+        }
+
+        // ---- Action button (page interconnection) ----
+        function getActionButton(userText, aiText) {
+            const lower = (userText + ' ' + aiText).toLowerCase();
+            if (lower.includes('study plan') || lower.includes('30-day') || lower.includes('30 day')) {
+                return { label: '📅 Create Study Plan', href: '/study-planner' };
+            }
+            if (lower.includes('placement') || lower.includes('interview')) {
+                return { label: '🏆 Open Placement Tracker', href: '/placement' };
+            }
+            if (lower.includes('career') || lower.includes('ai mentor') || lower.includes('career path')) {
+                return { label: '🎯 Explore Career Path', href: '/career' };
+            }
+            return null;
+        }
+
+        function addMessage(role, text, interactive = true) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = `msg ${role}`;
+
+            const avatarText = role === 'ai' ? 'AI' : studentName[0].toUpperCase();
+            const avatarClass = role === 'ai' ? 'ai' : 'user';
+
+            let extras = '';
+            if (role === 'ai' && interactive) {
+                const msgId = 'm_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+                const lastUserMsg = [...conversationHistory].reverse().find(m => m.role === 'user');
+                const followups = getFollowups(lastUserMsg ? lastUserMsg.content : text);
+                const resources = getResourcesForText((lastUserMsg ? lastUserMsg.content : '') + ' ' + text);
+                const action = getActionButton(lastUserMsg ? lastUserMsg.content : '', text);
+
+                extras += `
+      <div class="followup-block">
+        <div class="followup-title">📌 Continue with:</div>
+        ${followups.map(f => `<span class="followup-btn" onclick="askFollowup(this)">${f}</span>`).join('')}
+      </div>`;
+
+                if (resources) {
+                    extras += `
+      <div class="resource-block">
+        <div class="resource-title">📚 Recommended Resources</div>
+        <div class="resource-cards">
+          ${resources.map(r => `<a class="resource-card" href="${r.url}" target="_blank" rel="noopener">${r.name}</a>`).join('')}
+        </div>
+      </div>`;
+                }
+
+                if (action) {
+                    extras += `<a class="action-btn" href="${action.href}">${action.label} →</a>`;
+                }
+
+                extras += `
+      <div class="rate-block" id="rate-${msgId}">
+        <button class="rate-btn" onclick="rateMessage('${msgId}', true, this)">👍 Helpful</button>
+        <button class="rate-btn" onclick="rateMessage('${msgId}', false, this)">👎 Not Helpful</button>
+      </div>`;
+            }
+
+            div.innerHTML = `
+    <div class="msg-avatar ${avatarClass}">${avatarText}</div>
+    <div>
+      <div class="msg-bubble">${formatText(text)}</div>
+      <div class="msg-time">${getTime()}</div>
+      ${extras}
+    </div>
+  `;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+            return div;
+        }
+
+        function askFollowup(el) {
+            input.value = el.textContent.trim();
+            sendMessage();
+        }
+
+        function rateMessage(msgId, positive, el) {
+            const block = document.getElementById(`rate-${msgId}`);
+            if (!block) return;
+            block.querySelectorAll('.rate-btn').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+            // Best-effort feedback logging to backend (safe to ignore if endpoint doesn't exist)
+            fetch('/ai-mentor/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ helpful: positive })
+            }).catch(() => { });
+        }
+
+        function formatText(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n\n/g, '<br><br>')
+                .replace(/\n/g, '<br>')
+                .replace(/^• /gm, '→ ')
+                .replace(/^\d\. /gm, (m) => `<strong>${m}</strong>`);
+        }
+
+        function showTyping() {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.className = 'msg ai';
+            div.id = 'typing';
+            div.innerHTML = `
+    <div class="msg-avatar ai">AI</div>
+    <div class="typing-indicator">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>
+  `;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function removeTyping() {
+            const t = document.getElementById('typing');
+            if (t) t.remove();
+        }
+
+        async function sendMessage() {
+            const userText = input.value.trim();
+            if (!userText) return;
+
+            input.value = '';
+            input.style.height = 'auto';
+            document.getElementById('sendBtn').disabled = true;
+
+            addMessage('user', userText);
+            conversationHistory.push({ role: 'user', content: userText });
+
+            showTyping();
+
+            try {
+                const mentorMode = document.getElementById('mentorMode').value;
+                const response = await fetch('/ai-mentor/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: userText,
+                        history: conversationHistory,
+                        mode: mentorMode
+                    })
+                });
+
+                const data = await response.json();
+                removeTyping();
+
+                if (data.reply) {
+                    addMessage('ai', data.reply);
+                    conversationHistory.push({ role: 'assistant', content: data.reply });
+                    saveCurrentConversation();
+                } else {
+                    addMessage('ai', 'Sorry, something went wrong. Please try again!', false);
+                }
+            } catch (err) {
+                removeTyping();
+                addMessage('ai', 'Connection error. Make sure Flask is running and try again.', false);
+            }
+
+            document.getElementById('sendBtn').disabled = false;
+        }
+
+        // ---- Analyze My Profile ----
+        function analyzeProfile() {
+            if (!profileData) {
+                addMessage('ai', "I don't have your profile data loaded yet. Please complete your profile first!", false);
+                return;
+            }
+            const cgpa = profileData.cgpa ?? 'N/A';
+            const attendance = profileData.attendance ?? 'N/A';
+            const successScore = profileData.success_score ?? 'N/A';
+            const placementReadiness = profileData.placement_readiness ?? 'N/A';
+            const risk = profileData.academic_risk ?? 'N/A';
+            const goal = profileData.career_goal ?? 'your goal';
+
+            const strong = (cgpa !== 'N/A' && parseFloat(cgpa) >= 7.5) ? 'Academics (CGPA)' : 'Attendance';
+            const weak = risk === 'High' ? 'Academic Consistency' : (parseFloat(successScore) < 60 ? 'Overall Success Score' : 'Programming Practice');
+
+            const analysisText =
+                `📊 **Your Profile Analysis**\n\n` +
+                `Your CGPA is **${cgpa}**, attendance is **${attendance}**, and success score is **${successScore}/100**.\n\n` +
+                `✓ **Strong:** ${strong}\n` +
+                `⚠ **Weak:** ${weak}\n\n` +
+                `🎯 **Recommended:**\n` +
+                `• Focused practice to raise your ${weak.toLowerCase()}\n` +
+                `• Build 2-3 projects aligned with ${goal}\n` +
+                `• Daily DSA practice for placement readiness (currently ${placementReadiness}%)\n\n` +
+                `Want me to make a 30-day plan around this?`;
+
+            addMessage('user', 'Analyze my profile', false);
+            conversationHistory.push({ role: 'user', content: 'Analyze my profile' });
+            addMessage('ai', analysisText);
+            conversationHistory.push({ role: 'assistant', content: analysisText });
+            saveCurrentConversation();
+        }
+
+        // ---- Voice Input ----
+        let recognition = null;
+        let isRecording = false;
+        function toggleVoiceInput() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert('Voice input is not supported in this browser. Try Chrome.');
+                return;
+            }
+            const micBtn = document.getElementById('micBtn');
+            if (isRecording) {
+                recognition.stop();
+                return;
+            }
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-IN';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            recognition.onstart = () => {
+                isRecording = true;
+                micBtn.classList.add('recording');
+            };
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                input.value = (input.value ? input.value + ' ' : '') + transcript;
+                input.dispatchEvent(new Event('input'));
+            };
+            recognition.onerror = () => {
+                isRecording = false;
+                micBtn.classList.remove('recording');
+            };
+            recognition.onend = () => {
+                isRecording = false;
+                micBtn.classList.remove('recording');
+            };
+            recognition.start();
+        }
+
+        function clearChat() {
+            saveCurrentConversation();
+            currentConvId = null;
+            conversationHistory = [];
+            const messages = document.getElementById('messages');
+            const firstMsg = messages.querySelector('.msg');
+            messages.innerHTML = '';
+            if (firstMsg) messages.appendChild(firstMsg);
+        }
+    </script>
+</body>
+
+</html>

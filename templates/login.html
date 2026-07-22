@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSIP — Sign In</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080810;
+            --surface: #0E0C1A;
+            --surface2: #13101F;
+            --border: rgba(255, 255, 255, 0.07);
+            --crimson: #DC2626;
+            --violet: #7C3AED;
+            --text: #F0EEFF;
+            --muted: #6B6A8A
+        }
+
+        [data-theme="light"] {
+            --bg: #F7F5FF;
+            --surface: #FFFFFF;
+            --surface2: #F0EEFF;
+            --border: rgba(124, 58, 237, 0.12);
+            --text: #0F0D1F;
+            --muted: #55536F
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            -webkit-font-smoothing: antialiased;
+            transition: background .3s, color .3s
+        }
+
+        .theme-btn {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 380px
+        }
+
+        .brand-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 28px;
+            padding-left: 2px
+        }
+
+        .brand-mark {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            color: white;
+            flex-shrink: 0
+        }
+
+        .brand-name {
+            font-family: 'Manrope', sans-serif;
+            font-size: 15px;
+            font-weight: 800
+        }
+
+        .brand-inst {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED)
+        }
+
+        h1 {
+            font-family: 'Manrope', sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 4px
+        }
+
+        .sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 22px
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            font-weight: 700;
+            margin-bottom: 6px
+        }
+
+        input {
+            width: 100%;
+            padding: 11px 13px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color .15s;
+            margin-bottom: 16px
+        }
+
+        input:focus {
+            border-color: rgba(124, 58, 237, .55)
+        }
+
+        input::placeholder {
+            color: var(--muted)
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            border: none;
+            border-radius: 9px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity .15s
+        }
+
+        button:hover {
+            opacity: .9
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .link a {
+            color: #A78BFA;
+            text-decoration: none;
+            font-weight: 600
+        }
+
+        .link a:hover {
+            text-decoration: underline
+        }
+
+        .error {
+            background: rgba(220, 38, 38, .1);
+            border: 1px solid rgba(220, 38, 38, .3);
+            border-radius: 9px;
+            padding: 10px 13px;
+            font-size: 13px;
+            color: #F87171;
+            margin-bottom: 16px
+        }
+
+        .fine-print {
+            text-align: center;
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 20px
+        }
+    </style>
+    <script>
+        (function () {
+            const theme = localStorage.getItem('ssip-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+    <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+
+    <div class="wrap">
+        <div class="brand-row">
+            <div class="brand-mark">S</div>
+            <div>
+                <div class="brand-name">SSIP</div>
+                <div class="brand-inst">MITSGWL Gwalior · Student Portal</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h1>Sign in</h1>
+            <div class="sub">Enter your username and password to continue.</div>
+
+            {% if error %}
+            <div class="error">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="your_username" required autocomplete="username">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+                <button type="submit">Sign In</button>
+            </form>
+
+            <div class="link">
+                New here? <a href="/signup">Create account</a>
+            </div>
+        </div>
+
+        <div class="fine-print">Access is limited to MITSGWL students with a valid college email.</div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const b = document.body;
+            b.setAttribute('data-theme', b.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+            localStorage.setItem('ssip-theme', b.getAttribute('data-theme'));
+        }
+        document.body.setAttribute('data-theme', localStorage.getItem('ssip-theme') || 'dark');
+    </script>
+</body>
+
+</html>

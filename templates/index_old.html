@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSIP — Dashboard</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: "Segoe UI", sans-serif;
+            background: #0f172a;
+            color: white;
+            display: flex;
+            min-height: 100vh
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 240px;
+            background: #111827;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            color: #38bdf8;
+            padding: 0 8px;
+            margin-bottom: 4px
+        }
+
+        .logo-sub {
+            font-size: 10px;
+            color: #475569;
+            padding: 0 8px;
+            margin-bottom: 28px;
+            text-transform: uppercase;
+            letter-spacing: .05em
+        }
+
+        .nav-label {
+            font-size: 10px;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            padding: 6px 8px 4px;
+            margin-top: 12px
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 8px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 13px;
+            margin-bottom: 2px;
+            transition: all .15s
+        }
+
+        .nav a:hover {
+            background: #1e293b;
+            color: white
+        }
+
+        .nav a.active {
+            background: #1d4ed8;
+            color: white
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid #1e293b
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #6366f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            flex-shrink: 0
+        }
+
+        .u-name {
+            font-size: 13px;
+            font-weight: 500
+        }
+
+        .u-role {
+            font-size: 11px;
+            color: #64748b
+        }
+
+        .logout-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: #ef4444;
+            text-decoration: none;
+            font-size: 13px;
+            margin-top: 4px
+        }
+
+        .logout-link:hover {
+            background: rgba(239, 68, 68, .1)
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: 240px;
+            flex: 1;
+            padding: 28px 32px
+        }
+
+        /* TOPBAR */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 600
+        }
+
+        .page-sub {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 3px
+        }
+
+        .persona-chip {
+            background: #1e3a5f;
+            border: 1px solid #38bdf8;
+            border-radius: 99px;
+            padding: 5px 14px;
+            font-size: 12px;
+            color: #38bdf8
+        }
+
+        /* STAT CARDS */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px
+        }
+
+        .card {
+            background: #1e293b;
+            border-radius: 14px;
+            padding: 18px 20px;
+            border: 1px solid #334155
+        }
+
+        .card-label {
+            font-size: 11px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 10px
+        }
+
+        .card-val {
+            font-size: 26px;
+            font-weight: 700
+        }
+
+        .card-val.green {
+            color: #4ade80
+        }
+
+        .card-val.blue {
+            color: #38bdf8
+        }
+
+        .card-val.amber {
+            color: #fbbf24
+        }
+
+        .card-val.red {
+            color: #f87171
+        }
+
+        .card-sub {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 4px
+        }
+
+        /* GRID */
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px
+        }
+
+        .grid3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px
+        }
+
+        .box {
+            background: #1e293b;
+            border-radius: 14px;
+            padding: 20px;
+            border: 1px solid #334155
+        }
+
+        .box-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .box-title span {
+            font-size: 11px;
+            color: #38bdf8;
+            cursor: pointer
+        }
+
+        /* PROFILE SECTION */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px
+        }
+
+        .profile-item {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 10px 12px
+        }
+
+        .pi-label {
+            font-size: 10px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            margin-bottom: 3px
+        }
+
+        .pi-val {
+            font-size: 13px;
+            color: white;
+            font-weight: 500
+        }
+
+        /* SKILL BARS */
+        .skill-bar {
+            margin-bottom: 12px
+        }
+
+        .skill-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 5px
+        }
+
+        .bar-track {
+            height: 5px;
+            background: #334155;
+            border-radius: 99px;
+            overflow: hidden
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width .6s ease
+        }
+
+        /* ALERTS */
+        .alert-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid #334155;
+            font-size: 12px
+        }
+
+        .alert-item:last-child {
+            border-bottom: none
+        }
+
+        .alert-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-top: 3px;
+            flex-shrink: 0
+        }
+
+        /* RECOMMENDATIONS */
+        .rec-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid #334155;
+            font-size: 12px;
+            color: #94a3b8
+        }
+
+        .rec-item:last-child {
+            border-bottom: none
+        }
+
+        .rec-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0
+        }
+
+        /* QUICK ACCESS */
+        .qa-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px
+        }
+
+        .qa-item {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+            text-decoration: none;
+            color: #94a3b8;
+            font-size: 11px;
+            transition: all .15s;
+            display: block
+        }
+
+        .qa-item:hover {
+            background: #1e293b;
+            color: white;
+            border-color: #38bdf8
+        }
+
+        .qa-icon {
+            font-size: 20px;
+            margin-bottom: 5px
+        }
+
+        /* EMPTY STATE */
+        .empty {
+            text-align: center;
+            padding: 2rem;
+            color: #475569;
+            font-size: 13px
+        }
+
+        @media(max-width:1100px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .grid2,
+            .grid3 {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:700px) {
+            .sidebar {
+                display: none
+            }
+
+            .main {
+                margin-left: 0
+            }
+        }
+    </style>
+    <script>
+        (function () {
+            const theme = localStorage.getItem('ssip-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo">🎯 SSIP</div>
+        <div class="logo-sub">Intelligence Platform</div>
+
+        <div class="nav">
+            <div class="nav-label">Main</div>
+            <a href="/" class="active">🏠 Dashboard</a>
+            <a href="/profile">👤 Profile</a>
+            <a href="/analytics">📊 Analytics</a>
+
+            <div class="nav-label">AI Features</div>
+            <a href="/ai-mentor">🤖 AI Mentor</a>
+            <a href="/study-planner">📅 Study Planner</a>
+            <a href="/placement">🏆 Placement Readiness</a>
+            <a href="/career">🎯 Career Path</a>
+
+            <div class="nav-label">Tools</div>
+            <a href="/skills">⚡ Skills Tracker</a>
+            <a href="/reports">📄 Reports</a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="avatar">{{ session['user'][0].upper() }}</div>
+                <div>
+                    <div class="u-name">{{ session.get('user_name', session['user']) }}</div>
+                    <div class="u-role">Student</div>
+                </div>
+            </div>
+            <a href="/logout" class="logout-link">🚪 Logout</a>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div>
+                <div class="page-title">Welcome back, {{ session.get('user_name', session['user']).split()[0] }} 👋
+                </div>
+                <div class="page-sub">Here's your academic intelligence overview</div>
+            </div>
+            {% if profile and profile['persona'] %}
+            <div class="persona-chip">✦ {{ profile['persona'] }}</div>
+            {% else %}
+            <div class="persona-chip">✦ AI Student</div>
+            {% endif %}
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="cards">
+            <div class="card">
+                <div class="card-label">Success Score</div>
+                <div class="card-val green">
+                    {% if profile and profile['success_score'] %}{{ profile['success_score'] }}{% else %}—{% endif %}
+                    <span style="font-size:14px;color:#64748b">/100</span>
+                </div>
+                <div class="card-sub">{% if profile and profile['success_score'] %}Calculated from your data{% else
+                    %}Complete profile to see{% endif %}</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Academic Risk</div>
+                <div
+                    class="card-val {% if profile and profile['academic_risk'] == 'Low' %}green{% elif profile and profile['academic_risk'] == 'Medium' %}amber{% else %}red{% endif %}">
+                    {% if profile and profile['academic_risk'] %}{{ profile['academic_risk'] }}{% else %}—{% endif %}
+                </div>
+                <div class="card-sub">{% if profile and profile['academic_risk'] == 'Low' %}You're doing great!{% elif
+                    profile %}Monitor closely{% else %}Fill profile first{% endif %}</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Placement Readiness</div>
+                <div class="card-val blue">
+                    {% if profile and profile['placement_readiness'] %}{{ profile['placement_readiness'] }}%{% else
+                    %}—{% endif %}
+                </div>
+                <div class="card-sub">{% if profile and profile['placement_readiness'] %}Based on your skills{% else
+                    %}Not calculated yet{% endif %}</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Attendance</div>
+                <div class="card-val amber">
+                    {% if profile and profile['attendance'] %}{{ profile['attendance'] }}{% else %}—{% endif %}
+                </div>
+                <div class="card-sub">{% if profile %}From your form data{% else %}Not available{% endif %}</div>
+            </div>
+        </div>
+
+        <!-- MIDDLE GRID -->
+        <div class="grid2">
+
+            <!-- PROFILE SNAPSHOT -->
+            <div class="box">
+                <div class="box-title">📋 Your Academic Profile <span><a href="/profile"
+                            style="color:#38bdf8;text-decoration:none">View full →</a></span></div>
+                {% if profile %}
+                <div class="profile-grid">
+                    <div class="profile-item">
+                        <div class="pi-label">CGPA</div>
+                        <div class="pi-val">{{ profile['cgpa'] if profile['cgpa'] else '—' }}</div>
+                    </div>
+                    <div class="profile-item">
+                        <div class="pi-label">Career Goal</div>
+                        <div class="pi-val" style="font-size:12px">{{ profile['career_goal'][:30] if
+                            profile['career_goal'] else '—' }}</div>
+                    </div>
+                    <div class="profile-item">
+                        <div class="pi-label">Strong Area</div>
+                        <div class="pi-val" style="font-size:12px">{{ profile['strong_area'] if profile['strong_area']
+                            else '—' }}</div>
+                    </div>
+                    <div class="profile-item">
+                        <div class="pi-label">Weak Area</div>
+                        <div class="pi-val" style="font-size:12px">{{ profile['weak_area'] if profile['weak_area'] else
+                            '—' }}</div>
+                    </div>
+                    <div class="profile-item">
+                        <div class="pi-label">Projects Done</div>
+                        <div class="pi-val">{{ profile['projects_completed'] if profile['projects_completed'] else '—'
+                            }}</div>
+                    </div>
+                    <div class="profile-item">
+                        <div class="pi-label">Coding Frequency</div>
+                        <div class="pi-val" style="font-size:12px">{{ profile['coding_frequency'] if
+                            profile['coding_frequency'] else '—' }}</div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty">
+                    <div style="font-size:32px;margin-bottom:8px">📋</div>
+                    Profile not loaded yet.<br>
+                    <a href="/complete-profile" style="color:#38bdf8">Complete your assessment →</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- SKILL SNAPSHOT -->
+            <div class="box">
+                <div class="box-title">⚡ Skill Snapshot</div>
+                {% if profile %}
+                <div class="skill-bar">
+                    <div class="skill-top"><span>Coding</span><span>{{ profile['coding_skill'] }}/5</span></div>
+                    <div class="bar-track">
+                        <div class="bar-fill"
+                            style="width:{{ (profile['coding_skill'] or 0) * 20 }}%;background:#38bdf8"></div>
+                    </div>
+                </div>
+                <div class="skill-bar">
+                    <div class="skill-top"><span>Problem Solving</span><span>{{ profile['problem_solving'] }}/5</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill"
+                            style="width:{{ (profile['problem_solving'] or 0) * 20 }}%;background:#6366f1"></div>
+                    </div>
+                </div>
+                <div class="skill-bar">
+                    <div class="skill-top"><span>Communication</span><span>{{ profile['communication'] }}/5</span></div>
+                    <div class="bar-track">
+                        <div class="bar-fill"
+                            style="width:{{ (profile['communication'] or 0) * 20 }}%;background:#f59e0b"></div>
+                    </div>
+                </div>
+                <div class="skill-bar">
+                    <div class="skill-top"><span>Teamwork</span><span>{{ profile['teamwork'] }}/5</span></div>
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width:{{ (profile['teamwork'] or 0) * 20 }}%;background:#4ade80">
+                        </div>
+                    </div>
+                </div>
+                <div class="skill-bar">
+                    <div class="skill-top"><span>Project Building</span><span>{{ profile['project_skill'] }}/5</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill"
+                            style="width:{{ (profile['project_skill'] or 0) * 20 }}%;background:#f87171"></div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty">Skills will appear after profile is loaded.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- LOWER GRID -->
+        <div class="grid3">
+
+            <!-- ALERTS -->
+            <div class="box">
+                <div class="box-title">🔔 Alerts</div>
+                {% if profile %}
+                {% if profile['attendance'] and profile['attendance'] in ['Below 60%', '60-74%'] %}
+                <div class="alert-item">
+                    <div class="alert-dot" style="background:#ef4444"></div>
+                    <div>Attendance is low — attend more classes</div>
+                </div>
+                {% endif %}
+                {% if profile['backlog'] and profile['backlog'] == 'Yes' %}
+                <div class="alert-item">
+                    <div class="alert-dot" style="background:#f59e0b"></div>
+                    <div>Active backlog detected — clear it soon</div>
+                </div>
+                {% endif %}
+                {% if profile['biggest_challenge'] %}
+                <div class="alert-item">
+                    <div class="alert-dot" style="background:#6366f1"></div>
+                    <div>Challenge: {{ profile['biggest_challenge'] }}</div>
+                </div>
+                {% endif %}
+                <div class="alert-item" style="border:none">
+                    <div class="alert-dot" style="background:#4ade80"></div>
+                    <div>Profile successfully loaded ✓</div>
+                </div>
+                {% else %}
+                <div class="empty">No alerts yet.</div>
+                {% endif %}
+            </div>
+
+            <!-- RECOMMENDATIONS -->
+            <div class="box">
+                <div class="box-title">💡 Recommended Actions</div>
+                {% if profile %}
+                {% if (profile['communication'] or 0) < 3 %} <div class="rec-item">
+                    <div class="rec-icon" style="background:#1e3a5f">💬</div>Improve communication skills
+            </div>
+            {% endif %}
+            {% if (profile['coding_skill'] or 0) < 4 %} <div class="rec-item">
+                <div class="rec-icon" style="background:#1e1b4b">💻</div>Practice coding daily
+        </div>
+        {% endif %}
+        {% if profile['projects_completed'] in ['0', '1–2', None] %}
+        <div class="rec-item">
+            <div class="rec-icon" style="background:#1a2e1a">🚀</div>Build more projects
+        </div>
+        {% endif %}
+        {% if (profile['problem_solving'] or 0) < 3 %} <div class="rec-item">
+            <div class="rec-icon" style="background:#2d1b00">🧠</div>Practice DSA regularly
+    </div>
+    {% endif %}
+    <div class="rec-item" style="border:none">
+        <div class="rec-icon" style="background:#1e293b">📈</div>Keep attendance above 75%
+    </div>
+    {% else %}
+    <div class="empty">Complete your profile to get recommendations.</div>
+    {% endif %}
+    </div>
+
+    <!-- QUICK ACCESS -->
+    <div class="box">
+        <div class="box-title">⚡ Quick Access</div>
+        <div class="qa-grid">
+            <a href="/ai-mentor" class="qa-item">
+                <div class="qa-icon">🤖</div>AI Mentor
+            </a>
+            <a href="/study-planner" class="qa-item">
+                <div class="qa-icon">📅</div>Study Plan
+            </a>
+            <a href="/analytics" class="qa-item">
+                <div class="qa-icon">📊</div>Analytics
+            </a>
+            <a href="/placement" class="qa-item">
+                <div class="qa-icon">🏆</div>Placement
+            </a>
+            <a href="/skills" class="qa-item">
+                <div class="qa-icon">⚡</div>Skills
+            </a>
+            <a href="/reports" class="qa-item">
+                <div class="qa-icon">📄</div>Reports
+            </a>
+        </div>
+    </div>
+
+    </div>
+
+    </div>
+</body>
+
+</html>

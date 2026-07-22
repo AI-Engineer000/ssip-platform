@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSIP — Complete Your Profile</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080810;
+            --surface: #0E0C1A;
+            --surface2: #13101F;
+            --border: rgba(255, 255, 255, 0.07);
+            --crimson: #DC2626;
+            --violet: #7C3AED;
+            --green: #22C55E;
+            --text: #F0EEFF;
+            --muted: #6B6A8A
+        }
+
+        [data-theme="light"] {
+            --bg: #F7F5FF;
+            --surface: #FFFFFF;
+            --surface2: #F0EEFF;
+            --border: rgba(124, 58, 237, 0.12);
+            --text: #0F0D1F;
+            --muted: #55536F
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            -webkit-font-smoothing: antialiased;
+            transition: background .3s, color .3s
+        }
+
+        .theme-btn {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px
+        }
+
+        .wrap {
+            width: 100%;
+            max-width: 460px
+        }
+
+        .brand-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            padding-left: 2px
+        }
+
+        .brand-mark {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Manrope', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            color: white;
+            flex-shrink: 0
+        }
+
+        .brand-name {
+            font-family: 'Manrope', sans-serif;
+            font-size: 15px;
+            font-weight: 800
+        }
+
+        .brand-inst {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED)
+        }
+
+        .icon-wrap {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(124, 58, 237, .12);
+            border: 1px solid rgba(124, 58, 237, .3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin: 0 auto 16px
+        }
+
+        h1 {
+            font-family: 'Manrope', sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+            margin-bottom: 8px
+        }
+
+        p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.7;
+            margin-bottom: 20px
+        }
+
+        .email-badge {
+            display: inline-block;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 99px;
+            padding: 6px 16px;
+            font-size: 12px;
+            color: var(--text);
+            margin-bottom: 22px;
+            font-family: monospace
+        }
+
+        .steps {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 22px;
+            text-align: left
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--muted);
+            padding: 7px 0;
+            border-bottom: 1px solid var(--border);
+            line-height: 1.5
+        }
+
+        .step-item:last-child {
+            border-bottom: none
+        }
+
+        .step-num {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(34, 197, 94, .15);
+            color: var(--green);
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px
+        }
+
+        .btn-primary {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            border: none;
+            border-radius: 9px;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            margin-bottom: 10px;
+            transition: opacity .15s
+        }
+
+        .btn-primary:hover {
+            opacity: .9
+        }
+
+        .btn-secondary {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            color: var(--muted);
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            margin-bottom: 8px;
+            transition: border-color .15s, color .15s
+        }
+
+        .btn-secondary:last-child {
+            margin-bottom: 0
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(124, 58, 237, .4);
+            color: var(--text)
+        }
+    </style>
+    <script>
+        (function () {
+            const theme = localStorage.getItem('ssip-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+    <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+
+    <div class="wrap">
+        <div class="brand-row">
+            <div class="brand-mark">S</div>
+            <div>
+                <div class="brand-name">SSIP</div>
+                <div class="brand-inst">MITSGWL Gwalior · Student Portal</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="icon-wrap">📋</div>
+            <h1>Profile not found</h1>
+            <p>We couldn't find your details in our database. Please complete the student assessment form first.</p>
+
+            <div class="email-badge">{{ session['user_email'] }}</div>
+
+            <div class="steps">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div>Click the button below to open the Google Form</div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div>Fill it using your college email: <strong style="color:var(--text)">{{
+                            session['user_email'] }}</strong></div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div>Come back and login again — your profile will be created automatically</div>
+                </div>
+            </div>
+
+            <a href="https://docs.google.com/forms/d/1AAbTWXzOjfv2D6H0egOJP_6gAGAoOuuzYRhLFHIdfNg/viewform?usp=pp_url&entry.1234567890={{ session['user_email'] }}"
+                target="_blank" class="btn-primary">
+                Fill Assessment Form →
+            </a>
+            <a href="/check-profile" class="btn-secondary">
+                I've Submitted The Form
+            </a>
+            <a href="/logout" class="btn-secondary">Back to Login</a>
+        </div>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const b = document.body;
+            b.setAttribute('data-theme', b.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+            localStorage.setItem('ssip-theme', b.getAttribute('data-theme'));
+        }
+        document.body.setAttribute('data-theme', localStorage.getItem('ssip-theme') || 'dark');
+    </script>
+</body>
+
+</html>

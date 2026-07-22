@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSIP — Dashboard</title>
+    <link <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #080810;
+            --surface: #0E0C1A;
+            --surface2: #13101F;
+            --border: rgba(255, 255, 255, 0.07);
+            --crimson: #DC2626;
+            --violet: #7C3AED;
+            --text: #F0EEFF;
+            --muted: #6B6A8A;
+            --success: #22C55E;
+            --warning: #FBBF24;
+            --info: #60A5FA;
+            --danger: #F87171;
+        }
+
+        [data-theme="light"] {
+            --bg: #F7F5FF;
+            --surface: #FFFFFF;
+            --surface2: #F0EEFF;
+            --border: rgba(124, 58, 237, 0.12);
+            --text: #0F0D1F;
+            --muted: #6B6A8A;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-size: 14px;
+            line-height: 1.6;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            -webkit-font-smoothing: antialiased;
+            transition: background .3s, color .3s
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 20;
+            overflow-y: auto
+        }
+
+        .sb-top {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px
+        }
+
+        .logo {
+            font-family: 'Manrope', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .logo-sub {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 1px;
+            letter-spacing: .05em
+        }
+
+        .nav {
+            padding: 0 10px
+        }
+
+        .nav-label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            padding: 8px 6px 3px
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 1px;
+            transition: all .15s
+        }
+
+        .nav-item:hover {
+            background: rgba(124, 58, 237, .1);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: rgba(220, 38, 38, .15);
+            color: #F87171
+        }
+
+        .sb-footer {
+            margin-top: auto;
+            padding: 12px 16px 0;
+            border-top: 1px solid var(--border)
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0
+        }
+
+        .u-name {
+            font-size: 12px;
+            font-weight: 600
+        }
+
+        .u-role {
+            font-size: 10px;
+            color: var(--muted)
+        }
+
+        .logout {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            color: #F87171;
+            font-size: 12px;
+            text-decoration: none;
+            margin-top: 6px;
+            font-weight: 500
+        }
+
+        .logout:hover {
+            background: rgba(248, 113, 113, .1)
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: 220px;
+            flex: 1;
+            padding: 28px 32px;
+            max-width: calc(100vw - 220px)
+        }
+
+        /* TOPBAR */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.03em
+        }
+
+        .page-sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 3px
+        }
+
+        .persona-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 99px;
+            background: rgba(220, 38, 38, .12);
+            border: 1px solid rgba(220, 38, 38, .25);
+            font-size: 12px;
+            font-weight: 600;
+            color: #F87171
+        }
+
+        .theme-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-right: 8px
+        }
+
+        /* STAT CARDS */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 20px
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .2)
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px
+        }
+
+        .card.c1::after {
+            background: linear-gradient(90deg, #DC2626, #7C3AED)
+        }
+
+        .card.c2::after {
+            background: linear-gradient(90deg, #22C55E, #60A5FA)
+        }
+
+        .card.c3::after {
+            background: linear-gradient(90deg, #7C3AED, #60A5FA)
+        }
+
+        .card.c4::after {
+            background: linear-gradient(90deg, #FBBF24, #DC2626)
+        }
+
+        .card-label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            font-weight: 500;
+            margin-bottom: 8px
+        }
+
+        .card-val {
+            font-family: 'Syne', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.03em
+        }
+
+        .card-val.crimson {
+            color: #F87171
+        }
+
+        .card-val.green {
+            color: #4ADE80
+        }
+
+        .card-val.violet {
+            color: #A78BFA
+        }
+
+        .card-val.amber {
+            color: #FBBF24
+        }
+
+        .card-sub {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px;
+            font-weight: 500
+        }
+
+        /* GRID */
+        .grid21 {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+            gap: 16px;
+            margin-bottom: 16px
+        }
+
+        .grid3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px
+        }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px
+        }
+
+        /* SECTION */
+        .sec {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            transition: transform .2s, box-shadow .2s
+        }
+
+        .sec:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .15)
+        }
+
+        .sec-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px
+        }
+
+        .sec-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.01em
+        }
+
+        .sec-link {
+            font-size: 11px;
+            color: #A78BFA;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500
+        }
+
+        .sec-link:hover {
+            color: #DC2626
+        }
+
+        /* PROFILE SNAPSHOT */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px
+        }
+
+        .info-item {
+            background: var(--surface2);
+            border-radius: 8px;
+            padding: 10px 12px;
+            border: 1px solid var(--border)
+        }
+
+        .info-label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 3px;
+            font-weight: 500
+        }
+
+        .info-val {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: -0.01em
+        }
+
+        .info-val.crimson {
+            color: #F87171
+        }
+
+        .info-val.green {
+            color: #4ADE80
+        }
+
+        .info-val.violet {
+            color: #A78BFA
+        }
+
+        .info-val.amber {
+            color: #FBBF24
+        }
+
+        /* SKILL BARS */
+        .skill-row {
+            margin-bottom: 10px
+        }
+
+        .skill-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 5px;
+            font-weight: 500
+        }
+
+        .bar-track {
+            height: 6px;
+            background: var(--surface2);
+            border-radius: 99px;
+            overflow: hidden
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width .8s ease
+        }
+
+        /* ALERTS */
+        .alert-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 500
+        }
+
+        .alert-item:last-child {
+            border-bottom: none
+        }
+
+        .alert-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            margin-top: 3px;
+            flex-shrink: 0
+        }
+
+        /* RECOMMENDATIONS */
+        .rec-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text)
+        }
+
+        .rec-item:last-child {
+            border-bottom: none
+        }
+
+        .rec-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0
+        }
+
+        /* QUICK ACCESS */
+        .qa-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px
+        }
+
+        .qa-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 500;
+            transition: all .15s;
+            display: block
+        }
+
+        .qa-item:hover {
+            background: rgba(220, 38, 38, .1);
+            border-color: rgba(220, 38, 38, .3);
+            color: #F87171;
+            transform: translateY(-1px)
+        }
+
+        .qa-icon {
+            font-size: 22px;
+            margin-bottom: 5px
+        }
+
+        /* FORM */
+        .form-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 16px
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px
+        }
+
+        .field {
+            margin-bottom: 10px
+        }
+
+        .field label {
+            display: block;
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 5px;
+            font-weight: 500
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 9px 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: border-color .2s
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: rgba(220, 38, 38, .5)
+        }
+
+        .field input::placeholder {
+            color: var(--muted)
+        }
+
+        .field select option {
+            background: #0E0C1A
+        }
+
+        .subject-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 6px;
+            gap: 10px
+        }
+
+        .subject-name {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text);
+            flex: 1
+        }
+
+        .subject-credit {
+            font-size: 10px;
+            color: var(--muted)
+        }
+
+        .subject-row input {
+            width: 90px;
+            padding: 6px 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            text-align: center
+        }
+
+        .subject-row input:focus {
+            border-color: rgba(220, 38, 38, .5)
+        }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: opacity .2s, transform .15s;
+            letter-spacing: .02em
+        }
+
+        .analyze-btn:hover {
+            opacity: .9;
+            transform: translateY(-1px)
+        }
+
+        /* RESULTS */
+        .result-hero {
+            text-align: center;
+            padding: 1.25rem 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem
+        }
+
+        .result-label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            margin-bottom: 6px;
+            font-weight: 500
+        }
+
+        .result-score {
+            font-family: 'Syne', sans-serif;
+            font-size: 56px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            letter-spacing: -0.03em
+        }
+
+        .result-cat {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 14px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 600
+        }
+
+        .cat-excellent {
+            background: rgba(74, 222, 128, .12);
+            color: #4ADE80;
+            border: 1px solid rgba(74, 222, 128, .2)
+        }
+
+        .cat-good {
+            background: rgba(96, 165, 250, .12);
+            color: #60A5FA;
+            border: 1px solid rgba(96, 165, 250, .2)
+        }
+
+        .cat-average {
+            background: rgba(251, 191, 36, .12);
+            color: #FBBF24;
+            border: 1px solid rgba(251, 191, 36, .2)
+        }
+
+        .cat-low {
+            background: rgba(248, 113, 113, .12);
+            color: #F87171;
+            border: 1px solid rgba(248, 113, 113, .2)
+        }
+
+        .mini-bar-wrap {
+            margin-bottom: 10px
+        }
+
+        .mini-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 4px;
+            font-weight: 500
+        }
+
+        .chip-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 99px;
+            background: rgba(248, 113, 113, .12);
+            border: 1px solid rgba(248, 113, 113, .25);
+            color: #F87171;
+            font-size: 11px;
+            font-weight: 500;
+            margin: 2px
+        }
+
+        .suggest-item {
+            display: flex;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text);
+            line-height: 1.5;
+            font-weight: 500
+        }
+
+        .suggest-item:last-child {
+            border-bottom: none
+        }
+
+        .suggest-dot {
+            color: #DC2626;
+            flex-shrink: 0;
+            margin-top: 1px
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--muted)
+        }
+
+        .empty-icon {
+            font-size: 32px;
+            margin-bottom: 8px
+        }
+
+        .empty-text {
+            font-size: 12px;
+            font-weight: 500
+        }
+
+        /* SUBJECT TABLE */
+        .subj-table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        .subj-table th {
+            text-align: left;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            padding: 0 0 8px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .subj-table td {
+            padding: 8px 0;
+            font-size: 12px;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(255, 255, 255, .04)
+        }
+
+        .mark-pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 600
+        }
+
+        .mark-high {
+            background: rgba(74, 222, 128, .12);
+            color: #4ADE80
+        }
+
+        .mark-mid {
+            background: rgba(251, 191, 36, .12);
+            color: #FBBF24
+        }
+
+        .mark-low {
+            background: rgba(248, 113, 113, .12);
+            color: #F87171
+        }
+
+        /* LIGHT MODE */
+        [data-theme="light"] .sidebar {
+            box-shadow: 2px 0 12px rgba(124, 58, 237, .06)
+        }
+
+        [data-theme="light"] .card,
+        [data-theme="light"] .sec,
+        [data-theme="light"] .form-section {
+            background: #FFFFFF;
+            border-color: rgba(124, 58, 237, .1);
+            box-shadow: 0 2px 12px rgba(124, 58, 237, .05)
+        }
+
+        [data-theme="light"] .info-item,
+        [data-theme="light"] .surface2,
+        [data-theme="light"] .subject-row {
+            background: #F7F5FF;
+            border-color: rgba(124, 58, 237, .08)
+        }
+
+        [data-theme="light"] .field input,
+        [data-theme="light"] .field select {
+            background: #F7F5FF;
+            border-color: rgba(124, 58, 237, .15);
+            color: #0F0D1F
+        }
+
+        [data-theme="light"] .subject-row input {
+            background: #FFFFFF;
+            border-color: rgba(124, 58, 237, .15);
+            color: #0F0D1F
+        }
+
+        [data-theme="light"] .bar-track {
+            background: #EDE9FF
+        }
+
+        [data-theme="light"] .field select option {
+            background: #FFFFFF;
+            color: #0F0D1F
+        }
+
+        [data-theme="light"] .qa-item {
+            background: #F7F5FF;
+            border-color: rgba(124, 58, 237, .1)
+        }
+
+        [data-theme="light"] .qa-item:hover {
+            background: rgba(220, 38, 38, .06);
+            border-color: rgba(220, 38, 38, .2)
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(124, 58, 237, .3);
+            border-radius: 20px
+        }
+
+        @media(max-width:1100px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .grid21,
+            .grid3 {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:700px) {
+            .sidebar {
+                display: none
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 16px
+            }
+        }
+    </style>
+    <script>
+        (function () {
+            const theme = localStorage.getItem('ssip-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+    <div id="loading-overlay"
+        style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;display:flex;align-items:center;justify-content:center;">
+        <div style="background:var(--surface);padding:30px;border-radius:16px;text-align:center;">
+            <div style="font-size:40px;margin-bottom:12px;">⏳</div>
+            <div style="font-weight:600;">Loading your data...</div>
+        </div>
+    </div>
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="sb-top">
+            <div class="logo">SSIP</div>
+            <div class="logo-sub">Intelligence Platform</div>
+        </div>
+        <div class="nav">
+            <div class="nav-label">Main</div>
+            <a href="/" class="nav-item active">🏠 Dashboard</a>
+            <a href="/profile" class="nav-item">👤 Profile</a>
+            <a href="/analytics" class="nav-item">📊 Analytics</a>
+            <div class="nav-label">AI Features</div>
+            <a href="/ai-mentor" class="nav-item">🤖 AI Mentor</a>
+            <a href="/study-planner" class="nav-item">📅 Study Planner</a>
+            <a href="/placement" class="nav-item">🏆 Placement</a>
+            <a href="/career" class="nav-item">🎯 Career Path</a>
+            <div class="nav-label">Tools</div>
+            <a href="/skills" class="nav-item">⚡ Skills</a>
+            <a href="/reports" class="nav-item">📄 Reports</a>
+        </div>
+        <div class="sb-footer">
+            <div class="user-row">
+                <div class="avatar">{{ session['user'][0].upper() }}</div>
+                <div>
+                    <div class="u-name">{{ session.get('user_name', session['user']).split()[0] }}</div>
+                    <div class="u-role">Student · MITSGWL</div>
+                </div>
+            </div>
+            <a href="/logout" class="logout">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div>
+                <div class="page-title">Welcome back, {{ session.get('user_name', session['user']).split()[0] }} 👋
+                </div>
+                <div class="page-sub">Here's your academic intelligence overview</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+                <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌓</button>
+                {% if profile and profile['persona'] %}
+                <div class="persona-chip">✦ {{ profile['persona'] }}</div>
+                {% else %}
+                <div class="persona-chip">✦ AI Student</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="cards">
+            <div class="card c1">
+                <div class="card-label">Success Score</div>
+                <div class="card-val crimson">{{ profile['success_score'] if profile and profile['success_score'] else
+                    '—' }}<span style="font-size:14px;opacity:.5">/100</span></div>
+                <div class="card-sub">{% if profile and profile['success_score'] %}Calculated from your data{% else
+                    %}Complete profile{% endif %}</div>
+            </div>
+            <div class="card c2">
+                <div class="card-label">Academic Risk</div>
+                <div
+                    class="card-val {% if profile and profile['academic_risk'] == 'Low' %}green{% elif profile and profile['academic_risk'] == 'Medium' %}amber{% else %}crimson{% endif %}">
+                    {{ profile['academic_risk'] if profile and profile['academic_risk'] else '—' }}
+                </div>
+                <div class="card-sub">{% if profile and profile['academic_risk'] == 'Low' %}You're doing great!{% elif
+                    profile %}Monitor closely{% else %}Fill profile first{% endif %}</div>
+            </div>
+            <div class="card c3">
+                <div class="card-label">Placement Readiness</div>
+                <div class="card-val violet">{{ profile['placement_readiness'] if profile and
+                    profile['placement_readiness'] else '—' }}{% if profile and profile['placement_readiness'] %}<span
+                        style="font-size:14px">%</span>{% endif %}</div>
+                <div class="card-sub">{% if profile and profile['placement_readiness'] %}Based on your skills{% else
+                    %}Not calculated{% endif %}</div>
+            </div>
+            <div class="card c4">
+                <div class="card-label">Attendance</div>
+                <div class="card-val amber">{{ profile['attendance'] if profile and profile['attendance'] else '—' }}
+                </div>
+                <div class="card-sub">{% if profile %}From your form data{% else %}Not available{% endif %}</div>
+            </div>
+        </div>
+
+        <!-- MIDDLE: Analyzer + Results -->
+        <div class="grid21">
+
+            <!-- ANALYZER FORM -->
+            <div class="form-section">
+                <div class="sec-header">
+                    <div class="sec-title">🔬 Performance Analyzer</div>
+                </div>
+                <form action="/predict" method="post">
+                    <div class="form-row">
+                        <div class="field">
+                            <label>Attendance %</label>
+                            <input name="attendance" type="number" min="0" max="100" placeholder="e.g. 85"
+                                value="{{ attendance if attendance else '' }}" required>
+                        </div>
+                        <div class="field">
+                            <label>Previous CGPA</label>
+                            <input name="prevcgpa" type="number" min="0" max="10" step="0.01" placeholder="e.g. 8.2"
+                                value="{{ prevcgpa if prevcgpa else '' }}">
+                        </div>
+                        <div class="field">
+                            <label>Branch</label>
+                            <select id="branch" name="branch">
+                                <option value="">Select branch</option>
+                                <option value="CSE" {% if request.form.get('branch')=='CSE' %}selected{% endif %}>CSE
+                                </option>
+                                <option value="AI" {% if request.form.get('branch')=='AI' %}selected{% endif %}>AI
+                                </option>
+                                <option value="IT" {% if request.form.get('branch')=='IT' %}selected{% endif %}>IT
+                                </option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Semester</label>
+                            <select id="semester" name="semester">
+                                <option value="">Select semester</option>
+                                {% for i in range(1,9) %}
+                                <option value="{{i}}" {% if request.form.get('semester')==i|string %}selected{% endif
+                                    %}>Semester {{i}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="subjects-container">
+                        {% if subjects %}
+                        {% for i in range(subjects|length) %}
+                        <div class="subject-row">
+                            <div>
+                                <div class="subject-name">{{ subjects[i].name }}</div>
+                                <div class="subject-credit">{{ subjects[i].credit }} credits</div>
+                            </div>
+                            <input type="number" name="marks{{ i }}" min="0" max="100" placeholder="Marks"
+                                value="{{ marks[i] if marks else '' }}" required>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <button class="analyze-btn" type="submit">Analyze My Performance →</button>
+                </form>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div style="display:flex;flex-direction:column;gap:14px">
+
+                <!-- RESULT CARD -->
+                {% if predicted %}
+                <div class="sec">
+                    <div class="result-hero">
+                        <div class="result-label">Predicted CGPA</div>
+                        <div class="result-score">{{ predicted }}</div>
+                        <span
+                            class="result-cat {% if category == 'Excellent Performer' %}cat-excellent{% elif category == 'Good Performer' %}cat-good{% elif category == 'Average Performer' %}cat-average{% else %}cat-low{% endif %}">
+                            {{ category }}
+                        </span>
+                    </div>
+                    <div class="mini-bar-wrap">
+                        <div class="mini-bar-label"><span>Attendance</span><span>{{ attendance }}%</span></div>
+                        <div class="bar-track">
+                            <div class="bar-fill"
+                                style="width:{{ attendance }}%;background:linear-gradient(90deg,#DC2626,#7C3AED)"></div>
+                        </div>
+                    </div>
+                    <div class="mini-bar-wrap">
+                        <div class="mini-bar-label"><span>SGPA</span><span>{{ sgpa }}/10</span></div>
+                        <div class="bar-track">
+                            <div class="bar-fill"
+                                style="width:{{ sgpa*10 }}%;background:linear-gradient(90deg,#7C3AED,#60A5FA)"></div>
+                        </div>
+                    </div>
+                    <div class="mini-bar-wrap">
+                        <div class="mini-bar-label"><span>Predicted CGPA</span><span>{{ predicted }}/10</span></div>
+                        <div class="bar-track">
+                            <div class="bar-fill"
+                                style="width:{{ predicted*10 }}%;background:linear-gradient(90deg,#FBBF24,#DC2626)">
+                            </div>
+                        </div>
+                    </div>
+                    {% if weak %}
+                    <div style="margin-top:10px">
+                        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-weight:500">⚠️ Weak
+                            subjects</div>
+                        {% for w in weak %}<span class="chip-tag">{{w}}</span>{% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if suggestions %}
+                    <div style="margin-top:10px">
+                        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:500">💡 Suggestions
+                        </div>
+                        {% for s in suggestions %}
+                        <div class="suggest-item"><span class="suggest-dot">→</span>{{s}}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div
+                        style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);font-weight:500">
+                        🎯 Expected after improvement: <span style="color:#4ADE80;font-weight:700">{{ improved }}</span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="sec">
+                    <div class="empty-state">
+                        <div class="empty-icon">📊</div>
+                        <div class="empty-text">Fill the form and analyze<br>to see your predicted CGPA</div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- QUICK ACTIONS -->
+                <div class="sec">
+                    <div class="sec-header">
+                        <div class="sec-title">⚡ Quick Access</div>
+                    </div>
+                    <div class="qa-grid">
+                        <a href="/ai-mentor" class="qa-item">
+                            <div class="qa-icon">🤖</div>AI Mentor
+                        </a>
+                        <a href="/study-planner" class="qa-item">
+                            <div class="qa-icon">📅</div>Study Plan
+                        </a>
+                        <a href="/analytics" class="qa-item">
+                            <div class="qa-icon">📊</div>Analytics
+                        </a>
+                        <a href="/placement" class="qa-item">
+                            <div class="qa-icon">🏆</div>Placement
+                        </a>
+                        <a href="/profile" class="qa-item">
+                            <div class="qa-icon">👤</div>Profile
+                        </a>
+                        <a href="/reports" class="qa-item">
+                            <div class="qa-icon">📄</div>Reports
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOWER: Profile Snapshot + Alerts + Recommendations -->
+        <div class="grid3">
+
+            <!-- PROFILE SNAPSHOT -->
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">📋 Academic Profile</div>
+                    <a href="/profile" class="sec-link">View full →</a>
+                </div>
+                {% if profile %}
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">CGPA</div>
+                        <div class="info-val amber">{{ profile['cgpa'] if profile['cgpa'] else '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Career Goal</div>
+                        <div class="info-val violet" style="font-size:11px">{{ profile['career_goal'][:20] if
+                            profile['career_goal'] else '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Strong Area</div>
+                        <div class="info-val green" style="font-size:11px">{{ profile['strong_area'].split()[0] if
+                            profile['strong_area'] else '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Weak Area</div>
+                        <div class="info-val crimson" style="font-size:11px">{{ profile['weak_area'].split()[0] if
+                            profile['weak_area'] else '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Projects</div>
+                        <div class="info-val violet">{{ profile['projects_completed'] if profile['projects_completed']
+                            else '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Coding</div>
+                        <div class="info-val">{{ profile['coding_frequency'][:10] if profile['coding_frequency'] else
+                            '—' }}</div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <div class="empty-text"><a href="/complete-profile" style="color:#A78BFA">Complete assessment →</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- ALERTS -->
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">🔔 Alerts</div>
+                </div>
+                {% if profile %}
+                {% if profile['attendance'] in ['Below 60%', '60-74%'] %}
+                <div class="alert-item">
+                    <div class="alert-dot" style="background:#F87171"></div>
+                    <div>Attendance is low — attend more classes</div>
+                </div>
+                {% endif %}
+                {% if profile['backlog'] == 'Yes' %}
+                <div class="alert-item">
+                    <div class="alert-dot" style="background:#FBBF24"></div>
+                    <div>Active backlog — clear it soon</div>
+                </div>
+                {% endif %}
+                {% if profile['biggest_challenge'] %}
+                <div class="alert-item">
+                    <div class="alert-dot" style="background:#A78BFA"></div>
+                    <div>Challenge: {{ profile['biggest_challenge'] }}</div>
+                </div>
+                {% endif %}
+                {% if (profile['coding_skill'] or 0) < 3 %} <div class="alert-item">
+                    <div class="alert-dot" style="background:#FBBF24"></div>
+                    <div>Coding skill needs improvement</div>
+            </div>
+            {% endif %}
+            <div class="alert-item" style="border:none">
+                <div class="alert-dot" style="background:#4ADE80"></div>
+                <div>Profile successfully loaded ✓</div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-text">No alerts yet</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- RECOMMENDATIONS -->
+        <div class="sec">
+            <div class="sec-header">
+                <div class="sec-title">💡 Recommendations</div>
+            </div>
+            {% if profile %}
+            {% if (profile['communication'] or 0) < 4 %} <div class="rec-item">
+                <div class="rec-icon" style="background:rgba(220,38,38,.12)">💬</div>Improve communication skills
+        </div>
+        {% endif %}
+        {% if (profile['coding_skill'] or 0) < 4 %} <div class="rec-item">
+            <div class="rec-icon" style="background:rgba(124,58,237,.12)">💻</div>Practice coding daily</div>
+            {% endif %}
+            {% if profile['projects_completed'] in ['0','1–2',None,''] %}
+            <div class="rec-item">
+                <div class="rec-icon" style="background:rgba(74,222,128,.1)">🚀</div>Build more projects
+            </div>
+            {% endif %}
+            {% if (profile['problem_solving'] or 0) < 3 %} <div class="rec-item">
+                <div class="rec-icon" style="background:rgba(251,191,36,.1)">🧠</div>Practice DSA regularly</div>
+                {% endif %}
+                <div class="rec-item" style="border:none">
+                    <div class="rec-icon" style="background:rgba(96,165,250,.1)">📅</div>Keep attendance above 75%
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-text">Complete profile to get recommendations</div>
+                </div>
+                {% endif %}
+                </div>
+
+                </div>
+
+                <!-- SUBJECT TABLE -->
+                {% if predicted and subjects %}
+                <div class="sec" style="margin-bottom:16px">
+                    <div class="sec-header">
+                        <div class="sec-title">📚 Subject Performance</div>
+                    </div>
+                    <table class="subj-table">
+                        <tr>
+                            <th>Subject</th>
+                            <th>Marks</th>
+                            <th>Status</th>
+                        </tr>
+                        {% for i in range(subjects|length) %}
+                        <tr>
+                            <td>{{ subjects[i].name }}</td>
+                            <td style="font-weight:600">{{ marks[i] }}</td>
+                            <td>
+                                <span
+                                    class="mark-pill {% if marks[i]|float >= 80 %}mark-high{% elif marks[i]|float >= 60 %}mark-mid{% else %}mark-low{% endif %}">
+                                    {% if marks[i]|float >= 80 %}Strong{% elif marks[i]|float >= 60 %}Average{% else
+                                    %}Weak{% endif %}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                {% endif %}
+
+    </main>
+
+    <script>
+        function toggleTheme() {
+            const b = document.body;
+            const c = b.getAttribute('data-theme');
+            b.setAttribute('data-theme', c === 'light' ? 'dark' : 'light');
+            localStorage.setItem('ssip-theme', b.getAttribute('data-theme'));
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('ssip-theme') || 'dark';
+            document.body.setAttribute('data-theme', saved);
+        });
+
+        document.getElementById("branch").addEventListener("change", loadSubjects);
+        document.getElementById("semester").addEventListener("change", loadSubjects);
+
+        function loadSubjects() {
+            const branch = document.getElementById("branch").value;
+            const semester = document.getElementById("semester").value;
+            if (!branch || !semester) return;
+            fetch("/get_subjects", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ branch, semester })
+            })
+                .then(r => r.json())
+                .then(data => {
+                    const container = document.getElementById("subjects-container");
+                    container.innerHTML = "";
+                    data.forEach((sub, i) => {
+                        container.innerHTML += `
+        <div class="subject-row">
+          <div>
+            <div class="subject-name">${sub.name}</div>
+            <div class="subject-credit">${sub.credit} credits</div>
+          </div>
+          <input type="number" name="marks${i}" min="0" max="100" placeholder="Marks" required>
+        </div>`;
+                    });
+                });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const b = document.getElementById("branch").value;
+            const s = document.getElementById("semester").value;
+            if (b && s) loadSubjects();
+        });
+    </script>
+</body>
+
+</html>

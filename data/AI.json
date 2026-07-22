@@ -1,0 +1,104 @@
+{
+    "1": [
+        {
+            "name": "Digital Logic Design",
+            "credit": 3
+        },
+        {
+            "name": "Foundations of Artificial Intelligence",
+            "credit": 2
+        },
+        {
+            "name": "Internet and Web Technologies",
+            "credit": 3
+        },
+        {
+            "name": "Problem Solving and Programming",
+            "credit": 3
+        },
+        {
+            "name": "Linear Algebra",
+            "credit": 3
+        }
+    ],
+    "2": [
+        {
+            "name": "Discrete Structures",
+            "credit": 3
+        },
+        {
+            "name": "Modern Computer Architecture",
+            "credit": 3
+        },
+        {
+            "name": "Object Oriented Programming",
+            "credit": 3
+        },
+        {
+            "name": "Data Structures",
+            "credit": 3
+        },
+        {
+            "name": "Basic Electrical & Electronics Engineering",
+            "credit": 2
+        }
+    ],
+    "3": [
+        {
+            "name": "Probability and Random Processes",
+            "credit": 4
+        },
+        {
+            "name": "Design & Analysis of Algorithms",
+            "credit": 3
+        },
+        {
+            "name": "Knowledge Representation and Reasoning",
+            "credit": 3
+        },
+        {
+            "name": "Computer Networks",
+            "credit": 3
+        },
+        {
+            "name": "Operating Systems",
+            "credit": 3
+        }
+    ],
+    "4": [
+        {
+            "name": "Database Management System",
+            "credit": 3
+        },
+        {
+            "name": "Theory of Computation",
+            "credit": 3
+        },
+        {
+            "name": "Software Engineering",
+            "credit": 3
+        },
+        {
+            "name": "Network and Web Security",
+            "credit": 3
+        },
+        {
+            "name": "Caculus and Optimization Techniques",
+            "credit": 3
+        }
+    ],
+    "5": [
+        {
+            "name": "Machine Learning & Data Science",
+            "credit": 3
+        },
+        {
+            "name": "Cloud Computing & Virtualization",
+            "credit": 3
+        },
+        {
+            "name": "Evolutionary Algorithms and Optimization",
+            "credit": 3
+        }
+    ]
+}

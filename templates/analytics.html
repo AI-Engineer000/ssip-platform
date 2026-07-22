@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSIP - Analytics</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #080810;
+            --panel: #0E0C1A;
+            --panel-2: #13101F;
+            --panel-3: #19142A;
+            --border: rgba(255, 255, 255, 0.07);
+            --text: #F0EEFF;
+            --muted: #6B6A8A;
+            --red: #F87171;
+            --violet: #7C3AED;
+            --crimson: #DC2626;
+            --green: #22c55e;
+            --amber: #f59e0b;
+            --blue: #60a5fa;
+            --shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+        }
+
+        [data-theme="light"] {
+            --bg: #F7F5FF;
+            --panel: #ffffff;
+            --panel-2: #F0EEFF;
+            --panel-3: #EDE9FE;
+            --border: rgba(124, 58, 237, 0.12);
+            --text: #0F0D1F;
+            --muted: #6B6A8A;
+            --shadow: 0 8px 22px rgba(30, 41, 59, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Inter", sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            transition: background .25s, color .25s;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 20;
+            overflow-y: auto;
+        }
+
+        .sb-top {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        .logo {
+            font-family: "Manrope", sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(90deg, var(--crimson), var(--violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-sub {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 1px;
+            letter-spacing: .05em;
+        }
+
+        .nav {
+            padding: 0 10px;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            padding: 8px 6px 3px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 1px;
+            transition: all .15s;
+        }
+
+        .nav-item:hover {
+            background: rgba(124, 58, 237, .1);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(220, 38, 38, .15);
+            color: #f87171;
+        }
+
+        .sb-footer {
+            margin-top: auto;
+            padding: 12px 16px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--crimson), var(--violet));
+            display: grid;
+            place-items: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .u-name {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .u-role {
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .logout {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            color: #fb7185;
+            font-size: 12px;
+            text-decoration: none;
+            margin-top: 6px;
+            font-weight: 600;
+        }
+
+        .logout:hover {
+            background: rgba(248, 113, 113, .1);
+        }
+
+        .main {
+            margin-left: 220px;
+            width: calc(100% - 220px);
+            padding: 26px 30px 34px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #f87171;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            margin-bottom: 7px;
+        }
+
+        .page-title {
+            font-family: "Syne", sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        .page-sub {
+            color: var(--muted);
+            font-size: 13px;
+            max-width: 660px;
+            margin-top: 4px;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .pill {
+            border: 1px solid var(--border);
+            background: var(--panel-2);
+            color: var(--muted);
+            border-radius: 999px;
+            padding: 8px 13px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .theme-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--panel);
+            color: var(--text);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            font-size: 15px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .summary-card,
+        .panel,
+        .metric,
+        .action-row {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .summary-card {
+            border-radius: 12px;
+            padding: 16px;
+            min-height: 105px;
+        }
+
+        .summary-card span {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            margin-bottom: 10px;
+        }
+
+        .summary-card strong {
+            display: block;
+            font-family: "Manrope", sans-serif;
+            font-size: 30px;
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+
+        .summary-card small {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 7px;
+            font-weight: 600;
+        }
+
+        .summary-card::after {
+            content: "";
+            display: block;
+            height: 3px;
+            width: 42px;
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--crimson), var(--violet));
+            margin-top: 12px;
+        }
+
+        .panel-title {
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+
+        .timeline {
+            margin-top: 18px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .time-item {
+            display: grid;
+            grid-template-columns: 70px 1fr 42px;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .time-item span {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .time-track {
+            height: 9px;
+            border-radius: 99px;
+            background: var(--panel-2);
+            overflow: hidden;
+        }
+
+        .time-fill {
+            height: 100%;
+            width: var(--w);
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--crimson), var(--violet));
+        }
+
+        .time-item b {
+            font-size: 12px;
+            text-align: right;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .metric {
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .metric span {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        .metric strong {
+            display: block;
+            font-family: "Manrope", sans-serif;
+            font-size: 28px;
+            line-height: 1;
+            margin: 9px 0 5px;
+            letter-spacing: -0.04em;
+        }
+
+        .metric small {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .viz-grid {
+            display: grid;
+            grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .viz-grid.alt {
+            grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+        }
+
+        .panel {
+            border-radius: 12px;
+            padding: 18px;
+            min-height: 320px;
+        }
+
+        .panel-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .panel-sub {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .chart-box {
+            position: relative;
+            height: 248px;
+        }
+
+        .chart-box.tall {
+            height: 285px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .risk-map {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .risk-cell {
+            min-height: 96px;
+            padding: 13px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--panel-2);
+        }
+
+        .risk-cell strong {
+            display: block;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        .risk-cell span {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .risk-good {
+            border-color: rgba(34, 197, 94, .32);
+        }
+
+        .risk-watch {
+            border-color: rgba(245, 158, 11, .34);
+        }
+
+        .risk-bad {
+            border-color: rgba(239, 68, 68, .35);
+        }
+
+        .actions {
+            display: grid;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .action-row {
+            display: grid;
+            grid-template-columns: 34px 1fr;
+            gap: 11px;
+            align-items: start;
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .action-icon {
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: var(--panel-3);
+            font-size: 16px;
+        }
+
+        .action-row b {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        .action-row span {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            min-height: 340px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            color: var(--muted);
+            border: 1px dashed var(--border);
+            border-radius: 16px;
+            background: var(--panel);
+            padding: 26px;
+        }
+
+        @media (max-width: 1180px) {
+
+            .summary-grid,
+            .viz-grid,
+            .viz-grid.alt {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .metric-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 760px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                width: 100%;
+                margin-left: 0;
+                padding: 18px;
+            }
+
+            .topbar {
+                grid-template-columns: 1fr;
+                display: grid;
+            }
+
+            .top-actions {
+                justify-content: space-between;
+            }
+
+            .summary-grid,
+            .metric-grid,
+            .viz-grid,
+            .viz-grid.alt,
+            .risk-map {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <script>
+        (function () {
+            const theme = localStorage.getItem('ssip-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="sb-top">
+            <div class="logo">SSIP</div>
+            <div class="logo-sub">Intelligence Platform</div>
+        </div>
+        <div class="nav">
+            <div class="nav-label">Main</div>
+            <a href="/" class="nav-item">🏠 Dashboard</a>
+            <a href="/profile" class="nav-item">👤 Profile</a>
+            <a href="/analytics" class="nav-item active">📊 Analytics</a>
+            <div class="nav-label">AI Features</div>
+            <a href="/ai-mentor" class="nav-item">🤖 AI Mentor</a>
+            <a href="/study-planner" class="nav-item">📅 Study Planner</a>
+            <a href="/placement" class="nav-item">🏆 Placement</a>
+            <a href="/career" class="nav-item">🎯 Career Path</a>
+            <div class="nav-label">Tools</div>
+            <a href="/skills" class="nav-item">⚡ Skills</a>
+            <a href="/reports" class="nav-item">📄 Reports</a>
+        </div>
+        <div class="sb-footer">
+            <div class="user-row">
+                <div class="avatar">{{ session['user'][0].upper() }}</div>
+                <div>
+                    <div class="u-name">{{ session.get('user_name', session['user']).split()[0] }}</div>
+                    <div class="u-role">Student - MITSGWL</div>
+                </div>
+            </div>
+            <a href="/logout" class="logout">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <div class="eyebrow">Analytics</div>
+                <h1 class="page-title">Academic Performance Analysis</h1>
+                <p class="page-sub">Charts and graphs for academic performance, skills, placement readiness and growth.
+                </p>
+            </div>
+            <div class="top-actions">
+                <div class="pill">{{ profile['persona'] if profile and profile['persona'] else 'Profile needed' }}</div>
+                <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">◐</button>
+            </div>
+        </div>
+
+        {% if profile %}
+        {% set cgpa = profile['cgpa'] or 0 %}
+        {% set success = profile['success_score'] or 0 %}
+        {% set readiness = profile['placement_readiness'] or 0 %}
+        {% set attendance_pts = {'95-100%':96,'85-94%':90,'75-84%':80,'60-74%':67,'Below
+        60%':52}.get(profile['attendance'] or '',70) %}
+        {% set consistency = {'Daily':95,'3-5 Times a Week':82,'3–5 Times a Week':82,'1-2 Times a Week':58,'1–2 Times a
+        Week':58,'Rarely':34,'Never':8}.get(profile['coding_frequency'] or '',50) %}
+        {% set project_pct = {'0':12,'1-2':42,'1–2':42,'3-5':74,'3–5':74,'5+':96}.get(profile['projects_completed'] or
+        '',45) %}
+        {% set skill_avg = ((profile['coding_skill'] or 0) + (profile['problem_solving'] or 0) +
+        (profile['communication'] or 0) + (profile['teamwork'] or 0) + (profile['project_skill'] or 0)) / 5 %}
+        {% set technical = (((profile['coding_skill'] or 0) + (profile['problem_solving'] or 0) +
+        (profile['project_skill'] or 0)) / 15 * 100)|round|int %}
+        {% set communication = ((profile['communication'] or 0) * 20)|round|int %}
+        {% set teamwork = ((profile['teamwork'] or 0) * 20)|round|int %}
+        {% set cgpa_pct = (cgpa * 10)|round|int %}
+        {% set proj3 = [success + 5, 100]|min %}
+        {% set proj6 = [success + 10, 100]|min %}
+        {% set proj12 = [success + 16, 100]|min %}
+
+        <section class="viz-grid">
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="panel-title">Skill Comparison</div>
+                    <div class="panel-sub">Ratings out of 5</div>
+                </div>
+                <div class="chart-box tall"><canvas id="skillRadar"></canvas></div>
+            </div>
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="panel-title">Placement Factors</div>
+                    <div class="panel-sub">Readiness contributors</div>
+                </div>
+                <div class="chart-box tall"><canvas id="driverBars"></canvas></div>
+            </div>
+        </section>
+
+        <section class="viz-grid alt">
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="panel-title">Growth Projection</div>
+                    <div class="panel-sub">Estimated score movement</div>
+                </div>
+                <div class="chart-box"><canvas id="growthLine"></canvas></div>
+            </div>
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="panel-title">Performance Distribution</div>
+                    <div class="panel-sub">Current balance</div>
+                </div>
+                <div class="chart-box"><canvas id="profileDoughnut"></canvas></div>
+            </div>
+        </section>
+
+        <section class="viz-grid">
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="panel-title">Academic Indicators</div>
+                    <div class="panel-sub">CGPA, attendance, projects and practice</div>
+                </div>
+                <div class="chart-box tall"><canvas id="academicBars"></canvas></div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="panel-title">Readiness Split</div>
+                    <div class="panel-sub">Ready vs remaining</div>
+                </div>
+                <div class="chart-box tall"><canvas id="readinessDoughnut"></canvas></div>
+            </div>
+        </section>
+        {% else %}
+        <div class="empty-state">
+            <div>
+                <h2>Complete your profile first</h2>
+                <p>Analytics charts need CGPA, skills, attendance, projects, and placement readiness data.</p>
+            </div>
+        </div>
+        {% endif %}
+    </main>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const next = body.getAttribute("data-theme") === "light" ? "dark" : "light";
+            body.setAttribute("data-theme", next);
+            localStorage.setItem("ssip-theme", next);
+        }
+
+        function cssVar(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            document.body.setAttribute("data-theme", localStorage.getItem("ssip-theme") || "dark");
+        });
+
+        {% if profile %}
+        Chart.defaults.font.family = "Inter";
+        Chart.defaults.color = cssVar("--muted");
+        Chart.defaults.plugins.tooltip.backgroundColor = "rgba(15, 23, 42, 0.94)";
+        Chart.defaults.plugins.tooltip.padding = 10;
+        Chart.defaults.plugins.tooltip.cornerRadius = 8;
+
+        const palette = {
+            red: "#ef4444",
+            violet: "#8b5cf6",
+            crimson: "#dc2626",
+            green: "#22c55e",
+            amber: "#f59e0b",
+            blue: "#60a5fa",
+            grid: "rgba(148, 163, 184, 0.16)"
+        };
+
+        new Chart(document.getElementById("skillRadar"), {
+            type: "radar",
+            data: {
+                labels: ["Coding", "Problem Solving", "Communication", "Teamwork", "Projects"],
+                datasets: [{
+                    label: "Skill rating",
+                    data: [
+                        {{ profile['coding_skill'] or 0 }},
+                {{ profile['problem_solving'] or 0 }},
+                        {{ profile['communication'] or 0 }},
+            {{ profile['teamwork'] or 0 }},
+            {{ profile['project_skill'] or 0 }}
+                    ],
+            backgroundColor: "rgba(220, 38, 38, 0.18)",
+            borderColor: palette.crimson,
+            borderWidth: 2,
+            pointBackgroundColor: palette.red,
+            pointBorderColor: palette.red,
+            pointRadius: 4
+                }]
+            },
+            options: {
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    min: 0,
+                    max: 5,
+                    ticks: { display: false, stepSize: 1 },
+                    grid: { color: palette.grid },
+                    angleLines: { color: palette.grid },
+                    pointLabels: { color: cssVar("--text"), font: { size: 11, weight: 700 } }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: (ctx) => `${ctx.raw}/5` } }
+            }
+        }
+        });
+
+        new Chart(document.getElementById("driverBars"), {
+            type: "bar",
+            data: {
+                labels: ["Technical", "Projects", "Communication", "Teamwork", "Consistency", "CGPA"],
+                datasets: [{
+                    data: [{{ technical }}, {{ project_pct }}, {{ communication }}, {{ teamwork }}, {{ consistency }}, {{ cgpa_pct }}],
+            backgroundColor: [palette.crimson, palette.violet, palette.amber, palette.green, palette.blue, palette.red],
+            borderRadius: 8,
+            barThickness: 22
+                }]
+            },
+            options: {
+            indexAxis: "y",
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    min: 0,
+                    max: 100,
+                    grid: { color: palette.grid },
+                    ticks: { callback: (value) => `${value}%` }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { color: cssVar("--text"), font: { size: 11, weight: 700 } }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: (ctx) => `${ctx.raw}%` } }
+            }
+        }
+        });
+
+        new Chart(document.getElementById("growthLine"), {
+            type: "line",
+            data: {
+                labels: ["Current", "+3 months", "+6 months", "+12 months"],
+                datasets: [{
+                    label: "Success score",
+                    data: [{{ success }}, {{ proj3 }}, {{ proj6 }}, {{ proj12 }}],
+            borderColor: palette.crimson,
+            backgroundColor: "rgba(220, 38, 38, 0.14)",
+            fill: true,
+            tension: 0.38,
+            borderWidth: 3,
+            pointRadius: 5,
+            pointBackgroundColor: palette.red,
+            pointBorderColor: palette.red
+                }]
+            },
+            options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    min: 0,
+                    max: 100,
+                    grid: { color: palette.grid }
+                },
+                x: {
+                    grid: { color: palette.grid }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: (ctx) => `Score: ${ctx.raw}` } }
+            }
+        }
+        });
+
+        new Chart(document.getElementById("profileDoughnut"), {
+            type: "doughnut",
+            data: {
+                labels: ["Academic", "Technical", "Projects", "Consistency"],
+                datasets: [{
+                    data: [{{ cgpa_pct }}, {{ technical }}, {{ project_pct }}, {{ consistency }}],
+            backgroundColor: [palette.red, palette.crimson, palette.violet, palette.green],
+            borderColor: cssVar("--panel"),
+            borderWidth: 5,
+            hoverOffset: 8
+                }]
+            },
+            options: {
+            maintainAspectRatio: false,
+            cutout: "62%",
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        padding: 14,
+                        font: { size: 11, weight: 700 }
+                    }
+                },
+                tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw}%` } }
+            }
+        }
+        });
+
+        new Chart(document.getElementById("academicBars"), {
+            type: "bar",
+            data: {
+                labels: ["CGPA", "Attendance", "Projects", "Practice"],
+                datasets: [{
+                    label: "Score",
+                    data: [{{ cgpa_pct }}, {{ attendance_pts }}, {{ project_pct }}, {{ consistency }}],
+            backgroundColor: [palette.red, palette.violet, palette.amber, palette.green],
+            borderRadius: 8,
+            barThickness: 34
+                }]
+            },
+            options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    min: 0,
+                    max: 100,
+                    grid: { color: palette.grid },
+                    ticks: { callback: (value) => `${value}%` }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: cssVar("--text"), font: { size: 11, weight: 700 } }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: (ctx) => `${ctx.raw}%` } }
+            }
+        }
+        });
+
+        new Chart(document.getElementById("readinessDoughnut"), {
+            type: "doughnut",
+            data: {
+                labels: ["Placement Ready", "Remaining"],
+                datasets: [{
+                    data: [{{ readiness }}, {{ 100 - readiness }}],
+            backgroundColor: [palette.crimson, "rgba(255,255,255,0.08)"],
+            borderColor: cssVar("--panel"),
+            borderWidth: 5,
+            hoverOffset: 8
+        }]
+            },
+            options: {
+            maintainAspectRatio: false,
+            cutout: "68%",
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        usePointStyle: true,
+                        boxWidth: 8,
+                        padding: 14,
+                        font: { size: 11, weight: 700 }
+                    }
+                },
+                tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${ctx.raw}%` } }
+            }
+        }
+        });
+        {% endif %}
+    </script>
+</body>
+
+</html>

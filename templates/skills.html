@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSIP — Skills Tracker</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #080810;
+            --surface: #0E0C1A;
+            --surface2: #13101F;
+            --border: rgba(255, 255, 255, 0.07);
+            --crimson: #DC2626;
+            --violet: #7C3AED;
+            --amber: #F59E0B;
+            --green: #22C55E;
+            --text: #F0EEFF;
+            --muted: #6B6A8A
+        }
+
+        [data-theme="light"] {
+            --bg: #F7F5FF;
+            --surface: #FFFFFF;
+            --surface2: #F0EEFF;
+            --border: rgba(124, 58, 237, 0.12);
+            --text: #0F0D1F;
+            --muted: #55536F
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            -webkit-font-smoothing: antialiased;
+            transition: background .3s, color .3s
+        }
+
+        /* ---------- SIDEBAR ---------- */
+        .sidebar {
+            width: 220px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 20;
+            overflow-y: auto
+        }
+
+        .sb-top {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .logo-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 1px;
+            letter-spacing: .05em
+        }
+
+        .nav {
+            padding: 0 10px
+        }
+
+        .nav-label {
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            padding: 8px 6px 3px
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 1px;
+            transition: all .15s
+        }
+
+        .nav-item:hover {
+            background: rgba(124, 58, 237, .1);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: rgba(220, 38, 38, .15);
+            color: #F87171
+        }
+
+        .sb-footer {
+            margin-top: auto;
+            padding: 12px 16px 0;
+            border-top: 1px solid var(--border)
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0
+        }
+
+        .u-name {
+            font-size: 12px;
+            font-weight: 600
+        }
+
+        .u-role {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .logout {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            color: #F87171;
+            font-size: 12px;
+            text-decoration: none;
+            margin-top: 6px;
+            font-weight: 500
+        }
+
+        .logout:hover {
+            background: rgba(248, 113, 113, .1)
+        }
+
+        /* ---------- MAIN ---------- */
+        .main {
+            margin-left: 220px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto
+        }
+
+        .topbar {
+            padding: 20px 28px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            z-index: 10;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.03em
+        }
+
+        .page-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .theme-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px
+        }
+
+        .content {
+            padding: 22px 28px 44px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .card-title span.sub {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted)
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 10px;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 99px
+        }
+
+        /*  SECTION 1: OVERALL SCORE  */
+        .overall-hero {
+            background: linear-gradient(135deg, rgba(220, 38, 38, .12), rgba(124, 58, 237, .12));
+            border: 1px solid rgba(124, 58, 237, .3);
+            border-radius: 18px;
+            padding: 26px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 26px;
+            align-items: center
+        }
+
+        .overall-ring {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0
+        }
+
+        .overall-ring-inner {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            background: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center
+        }
+
+        .overall-ring-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800
+        }
+
+        .overall-ring-label {
+            font-size: 9px;
+            color: var(--muted)
+        }
+
+        .overall-label {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .06em
+        }
+
+        .overall-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            margin-top: 2px
+        }
+
+        /*  SKILL BARS (shared style)  */
+        .skill-row {
+            margin-bottom: 14px
+        }
+
+        .skill-row:last-child {
+            margin-bottom: 0
+        }
+
+        .skill-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px
+        }
+
+        .skill-top .nums {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500
+        }
+
+        .skill-bar-bg {
+            height: 10px;
+            border-radius: 99px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            transition: width .6s ease
+        }
+
+        /*  RADAR CHART CARD  */
+        .radar-wrap {
+            max-width: 480px;
+            margin: 0 auto
+        }
+
+        /*  TECH BADGES  */
+        .badge-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px
+        }
+
+        .tech-badge {
+            padding: 7px 14px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 700;
+            color: #A78BFA
+        }
+
+        /*  ADD SKILL FORM  */
+        .add-skill-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: flex-end
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-width: 160px
+        }
+
+        .form-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .05em
+        }
+
+        .form-input,
+        .form-select {
+            padding: 10px 12px;
+            border-radius: 9px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            outline: none
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            border-color: rgba(124, 58, 237, .5)
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            border-radius: 9px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            border: none;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity .15s
+        }
+
+        .btn-primary:hover {
+            opacity: .9
+        }
+
+        .form-msg {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px
+        }
+
+        .form-msg.success {
+            color: #4ADE80
+        }
+
+        .form-msg.error {
+            color: #F87171
+        }
+
+        /*  RECOMMENDATIONS  */
+        .goal-strip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            margin-bottom: 14px;
+            font-size: 13px
+        }
+
+        .goal-strip strong {
+            color: #A78BFA
+        }
+
+        .rec-chip-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px
+        }
+
+        .rec-chip {
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: rgba(34, 197, 94, .1);
+            border: 1px solid rgba(34, 197, 94, .3);
+            font-size: 12px;
+            font-weight: 700;
+            color: #4ADE80
+        }
+
+        /*  ACHIEVEMENTS  */
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px
+        }
+
+        .achievement-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px;
+            border-radius: 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border)
+        }
+
+        .achievement-icon {
+            font-size: 24px
+        }
+
+        .achievement-title {
+            font-size: 12px;
+            font-weight: 700
+        }
+
+        /*  WEAK SKILL ALERT  */
+        .weak-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: rgba(220, 38, 38, .1);
+            border: 1px solid rgba(220, 38, 38, .3);
+            margin-bottom: 8px
+        }
+
+        .weak-row:last-child {
+            margin-bottom: 0
+        }
+
+        .weak-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #F87171
+        }
+
+        .weak-value {
+            font-size: 13px;
+            font-weight: 800;
+            color: #F87171
+        }
+
+        @media (max-width: 700px) {
+            .overall-hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                justify-items: center
+            }
+        }
+    </style>
+    <script>
+        (function () {
+            const theme = localStorage.getItem('ssip-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+
+    <nav class="sidebar">
+        <div class="sb-top">
+            <div class="logo">SSIP</div>
+            <div class="logo-sub">Intelligence Platform</div>
+        </div>
+        <div class="nav">
+            <div class="nav-label">Main</div>
+            <a href="/" class="nav-item">🏠 Dashboard</a>
+            <a href="/profile" class="nav-item">👤 Profile</a>
+            <a href="/analytics" class="nav-item">📊 Analytics</a>
+            <div class="nav-label">AI Features</div>
+            <a href="/ai-mentor" class="nav-item">🤖 AI Mentor</a>
+            <a href="/study-planner" class="nav-item">📅 Study Planner</a>
+            <a href="/placement" class="nav-item">🏆 Placement</a>
+            <a href="/career" class="nav-item">🎯 Career Path</a>
+            <div class="nav-label">Tools</div>
+            <a href="/skills" class="nav-item active">⚡ Skills</a>
+            <a href="/reports" class="nav-item">📄 Reports</a>
+        </div>
+        <div class="sb-footer">
+            <div class="user-row">
+                <div class="avatar">{{ session['user'][0].upper() }}</div>
+                <div>
+                    <div class="u-name">{{ session.get('user_name', session['user']).split()[0] }}</div>
+                    <div class="u-role">Student · MITSGWL</div>
+                </div>
+            </div>
+            <a href="/logout" class="logout">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <div class="page-title">⚡ Skills Tracker</div>
+                <div class="page-sub" id="pageSub">Loading your skill growth...</div>
+            </div>
+            <div class="topbar-actions">
+                <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+            </div>
+        </div>
+
+        <div class="content">
+
+            <!-- 1: OVERALL SKILL SCORE -->
+            <div class="overall-hero">
+                <div class="overall-ring" id="overallRing">
+                    <div class="overall-ring-inner">
+                        <div class="overall-ring-num" id="overallRingNum">–</div>
+                        <div class="overall-ring-label">SCORE</div>
+                    </div>
+                </div>
+                <div>
+                    <div class="overall-label">Overall Skill Score</div>
+                    <div class="overall-title" id="overallTitle">–%</div>
+                </div>
+            </div>
+
+            <!-- SKILL BREAKDOWN -->
+            <div class="card">
+                <div class="card-title">Skill Breakdown</div>
+                <div id="breakdownWrap">
+                    <div class="empty-state">Loading...</div>
+                </div>
+            </div>
+
+            <!-- 2: RADAR CHART -->
+            <div class="card">
+                <div class="card-title">Skill Radar<span class="sub">your profile at a glance</span></div>
+                <div class="radar-wrap">
+                    <canvas id="radarChart" height="280"></canvas>
+                </div>
+            </div>
+
+            <!-- 3: TECHNOLOGIES KNOWN -->
+            <div class="card">
+                <div class="card-title">Technologies Known</div>
+                <div class="badge-wrap" id="techWrap"></div>
+            </div>
+
+            <!-- 4: ADD NEW SKILL -->
+            <div class="card">
+                <div class="card-title">Add New Skill</div>
+                <div class="add-skill-form">
+                    <div class="form-group">
+                        <label class="form-label">Skill Name</label>
+                        <input class="form-input" id="newSkillName" placeholder="e.g. Docker" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Level</label>
+                        <select class="form-select" id="newSkillLevel">
+                            <option>Beginner</option>
+                            <option>Intermediate</option>
+                            <option>Advanced</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" onclick="addSkill()">+ Add Skill</button>
+                </div>
+                <div class="form-msg" id="addSkillMsg"></div>
+            </div>
+
+            <!-- 5: SKILL GROWTH HISTORY -->
+            <div class="card">
+                <div class="card-title">Skill Growth History<span class="sub" id="growthSub">Coding Skill</span></div>
+                <canvas id="growthChart" height="140"></canvas>
+            </div>
+
+            <!-- 6: RECOMMENDATIONS -->
+            <div class="card">
+                <div class="card-title">Skill Recommendations</div>
+                <div class="goal-strip">🎯 Current Goal: <strong id="recGoal">–</strong></div>
+                <div class="rec-chip-wrap" id="recWrap"></div>
+            </div>
+
+            <!-- 7: ACHIEVEMENTS -->
+            <div class="card">
+                <div class="card-title">Skill Achievements</div>
+                <div class="achievement-grid" id="achievementWrap"></div>
+            </div>
+
+            <!-- 8: WEAK SKILL ALERT -->
+            <div class="card">
+                <div class="card-title">⚠ Attention Needed</div>
+                <div id="weakWrap"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        let radarChartInstance = null;
+        let growthChartInstance = null;
+        let lastData = null;
+
+        function toggleTheme() {
+            const b = document.body;
+            b.setAttribute('data-theme', b.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+            localStorage.setItem('ssip-theme', b.getAttribute('data-theme'));
+            if (lastData) {
+                renderRadar(lastData.breakdown);
+                renderGrowth(lastData.growth_history);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.body.setAttribute('data-theme', localStorage.getItem('ssip-theme') || 'dark');
+            loadSkillsData();
+        });
+
+        async function loadSkillsData() {
+            try {
+                const res = await fetch('/skills/data');
+                const data = await res.json();
+                if (data.error) {
+                    document.getElementById('pageSub').textContent = data.error;
+                    return;
+                }
+                lastData = data;
+                document.getElementById('pageSub').textContent = 'Tracking your growth across all core skills';
+
+                renderOverall(data.overall_score);
+                renderBreakdown(data.breakdown);
+                renderRadar(data.breakdown);
+                renderTech(data.technologies);
+                renderGrowth(data.growth_history);
+                renderRecommendations(data.recommendations);
+                renderAchievements(data.achievements);
+                renderWeak(data.weak_skills);
+            } catch (e) {
+                document.getElementById('pageSub').textContent = 'Could not load skills data — check Flask server.';
+                console.error(e);
+            }
+        }
+
+        function renderOverall(score) {
+            document.getElementById('overallTitle').textContent = score + '%';
+            document.getElementById('overallRingNum').textContent = score + '%';
+            const deg = Math.round((score / 100) * 360);
+            document.getElementById('overallRing').style.background = `conic-gradient(#7C3AED ${deg}deg, var(--surface2) ${deg}deg)`;
+        }
+
+        function renderBreakdown(breakdown) {
+            const labels = {
+                coding_skill: 'Coding Skill',
+                problem_solving: 'Problem Solving',
+                communication: 'Communication',
+                teamwork: 'Teamwork',
+                project_skill: 'Project Skill'
+            };
+            const wrap = document.getElementById('breakdownWrap');
+            wrap.innerHTML = Object.keys(labels).map(key => `
+        <div class="skill-row">
+          <div class="skill-top"><span>${labels[key]}</span><span class="nums">${breakdown[key] ?? 0}%</span></div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:${breakdown[key] ?? 0}%"></div></div>
+        </div>
+      `).join('');
+        }
+
+        function renderRadar(breakdown) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            const isLight = document.body.getAttribute('data-theme') === 'light';
+            const textColor = isLight ? '#55536F' : '#6B6A8A';
+            const gridColor = isLight ? 'rgba(124,58,237,.12)' : 'rgba(255,255,255,.08)';
+
+            if (radarChartInstance) radarChartInstance.destroy();
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Coding', 'Problem Solving', 'Communication', 'Teamwork', 'Project Skill'],
+                    datasets: [{
+                        data: [breakdown.coding_skill, breakdown.problem_solving, breakdown.communication, breakdown.teamwork, breakdown.project_skill],
+                        backgroundColor: 'rgba(124, 58, 237, .25)',
+                        borderColor: '#7C3AED',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#DC2626',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        r: {
+                            min: 0, max: 100,
+                            ticks: { color: textColor, backdropColor: 'transparent', stepSize: 20 },
+                            grid: { color: gridColor },
+                            angleLines: { color: gridColor },
+                            pointLabels: { color: textColor, font: { size: 11, weight: 600 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderTech(techs) {
+            const wrap = document.getElementById('techWrap');
+            if (!techs.length) { wrap.innerHTML = '<div class="empty-state">No technologies added yet.</div>'; return; }
+            wrap.innerHTML = techs.map(t => `<div class="tech-badge">${t}</div>`).join('');
+        }
+
+        async function addSkill() {
+            const name = document.getElementById('newSkillName').value.trim();
+            const level = document.getElementById('newSkillLevel').value;
+            const msg = document.getElementById('addSkillMsg');
+            if (!name) { msg.textContent = 'Please enter a skill name.'; msg.className = 'form-msg error'; return; }
+            try {
+                const res = await fetch('/skills/add', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ skill_name: name, level: level })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    msg.textContent = `✓ "${name}" added as ${level}.`;
+                    msg.className = 'form-msg success';
+                    document.getElementById('newSkillName').value = '';
+                    loadSkillsData();
+                } else {
+                    msg.textContent = data.error || 'Could not save skill.';
+                    msg.className = 'form-msg error';
+                }
+            } catch (e) {
+                msg.textContent = 'Server error — could not save skill.';
+                msg.className = 'form-msg error';
+            }
+        }
+
+        function renderGrowth(growth) {
+            document.getElementById('growthSub').textContent = growth.skill_name || 'Coding Skill';
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            const isLight = document.body.getAttribute('data-theme') === 'light';
+            const textColor = isLight ? '#55536F' : '#6B6A8A';
+
+            if (growthChartInstance) growthChartInstance.destroy();
+            const grad = ctx.createLinearGradient(0, 0, 0, 220);
+            grad.addColorStop(0, 'rgba(124, 58, 237, .35)');
+            grad.addColorStop(1, 'rgba(124, 58, 237, 0)');
+
+            growthChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: growth.labels,
+                    datasets: [{
+                        data: growth.data,
+                        borderColor: '#DC2626',
+                        backgroundColor: grad,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: .35,
+                        pointBackgroundColor: '#7C3AED',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: textColor }, grid: { display: false } },
+                        y: { min: 0, max: 100, ticks: { color: textColor, callback: v => v + '%' }, grid: { color: 'rgba(128,128,128,.1)' } }
+                    }
+                }
+            });
+        }
+
+        function renderRecommendations(rec) {
+            document.getElementById('recGoal').textContent = rec.goal || '–';
+            document.getElementById('recWrap').innerHTML = (rec.learn_next || []).map(s => `<div class="rec-chip">→ ${s}</div>`).join('');
+        }
+
+        function renderAchievements(achievements) {
+            const wrap = document.getElementById('achievementWrap');
+            if (!achievements.length) { wrap.innerHTML = '<div class="empty-state">No achievements unlocked yet — keep going! 🚀</div>'; return; }
+            wrap.innerHTML = achievements.map(a => `
+        <div class="achievement-card">
+          <div class="achievement-icon">${a.icon || '🏅'}</div>
+          <div class="achievement-title">${a.title}</div>
+        </div>
+      `).join('');
+        }
+
+        function renderWeak(weak) {
+            const wrap = document.getElementById('weakWrap');
+            if (!weak.length) { wrap.innerHTML = '<div class="empty-state">No weak areas detected — great job! 🎉</div>'; return; }
+            wrap.innerHTML = weak.map(w => `
+        <div class="weak-row">
+          <span class="weak-name">${w.name}</span>
+          <span class="weak-value">${w.value}%</span>
+        </div>
+      `).join('');
+        }
+    </script>
+</body>
+
+</html>

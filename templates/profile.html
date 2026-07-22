@@ -1,0 +1,2200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSIP — My Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #080810;
+            --surface: #0E0C1A;
+            --surface2: #13101F;
+            --border: rgba(255, 255, 255, 0.07);
+            --crimson: #DC2626;
+            --violet: #7C3AED;
+            --accent: linear-gradient(135deg, #DC2626, #7C3AED);
+            --text: #F0EEFF;
+            --muted: #6B6A8A;
+            --success: #22C55E;
+            --warning: #FBBF24;
+            --info: #60A5FA;
+            --danger: #F87171;
+        }
+
+        [data-theme="light"] {
+            --bg: #F4F2FF;
+            --surface: #FFFFFF;
+            --surface2: #F0EEFF;
+            --border: rgba(0, 0, 0, 0.08);
+            --text: #12102A;
+            --muted: #7C7A9A;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            transition: background .3s, color .3s;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: 220px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 20;
+        }
+
+        .sb-top {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-sub {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 1px;
+            letter-spacing: .05em;
+        }
+
+        .nav {
+            padding: 0 10px;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            padding: 8px 6px 3px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 12px;
+            margin-bottom: 1px;
+            transition: all .15s;
+        }
+
+        .nav-item:hover {
+            background: rgba(124, 58, 237, .1);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(220, 38, 38, .15);
+            color: #F87171;
+        }
+
+        .sb-footer {
+            margin-top: auto;
+            padding: 12px 16px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .u-name {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .u-role {
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .logout {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            color: #F87171;
+            font-size: 12px;
+            text-decoration: none;
+            margin-top: 6px;
+        }
+
+        .logout:hover {
+            background: rgba(248, 113, 113, .1);
+        }
+
+        /* ── MAIN ── */
+        .main {
+            margin-left: 220px;
+            flex: 1;
+            padding: 28px 32px;
+            max-width: calc(100vw - 220px);
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .page-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 3px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all .15s;
+            text-decoration: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        .btn-outline:hover {
+            border-color: rgba(124, 58, 237, .5);
+            color: #A78BFA;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: .9;
+            transform: translateY(-1px);
+        }
+
+        .theme-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all .15s;
+        }
+
+        .theme-btn:hover {
+            border-color: rgba(220, 38, 38, .4);
+        }
+
+        /* ── HERO CARD ── */
+        .hero-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+        }
+
+        .hero-inner {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .hero-avatar-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .hero-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .hero-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .hero-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .verified {
+            font-size: 14px;
+        }
+
+        .hero-meta {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 4px;
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .persona-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 5px 14px;
+            border-radius: 99px;
+            background: rgba(220, 38, 38, .15);
+            border: 1px solid rgba(220, 38, 38, .3);
+            font-size: 12px;
+            font-weight: 500;
+            color: #F87171;
+        }
+
+        .hero-scores {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .score-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .sp-label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .sp-val {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .sp-val.crimson {
+            color: #F87171;
+        }
+
+        .sp-val.violet {
+            color: #A78BFA;
+        }
+
+        .sp-val.green {
+            color: #4ADE80;
+        }
+
+        .sp-val.amber {
+            color: #FBBF24;
+        }
+
+        /* ── GRID LAYOUTS ── */
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .grid3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .grid21 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .grid12 {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        /* ── SECTION CARD ── */
+        .sec {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px 20px;
+        }
+
+        .sec-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .sec-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sec-edit {
+            font-size: 11px;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: transparent;
+            transition: all .15s;
+        }
+
+        .sec-edit:hover {
+            border-color: rgba(124, 58, 237, .4);
+            color: #A78BFA;
+        }
+
+        /* ── INFO GRID ── */
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .info-item {
+            background: var(--surface2);
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .info-label {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 3px;
+        }
+
+        .info-val {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .info-val.crimson {
+            color: #F87171;
+        }
+
+        .info-val.violet {
+            color: #A78BFA;
+        }
+
+        .info-val.green {
+            color: #4ADE80;
+        }
+
+        .info-val.amber {
+            color: #FBBF24;
+        }
+
+        /* ── SKILL BARS ── */
+        .skill-row {
+            margin-bottom: 10px;
+        }
+
+        .skill-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 5px;
+        }
+
+        .bar-track {
+            height: 6px;
+            background: var(--surface2);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width .8s ease;
+        }
+
+        /* ── ACADEMIC JOURNEY ── */
+        .journey-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+        }
+
+        .journey-item:last-child {
+            border-bottom: none;
+        }
+
+        .j-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .j-sem {
+            font-size: 12px;
+            color: var(--muted);
+            width: 60px;
+            flex-shrink: 0;
+        }
+
+        .j-data {
+            flex: 1;
+        }
+
+        .j-cgpa {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .j-label {
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .j-badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 99px;
+            font-weight: 500;
+        }
+
+        .j-ongoing {
+            background: rgba(220, 38, 38, .15);
+            color: #F87171;
+            border: 1px solid rgba(220, 38, 38, .3);
+        }
+
+        .j-done {
+            background: rgba(74, 222, 128, .1);
+            color: #4ADE80;
+            border: 1px solid rgba(74, 222, 128, .2);
+        }
+
+        /* ── TAGS ── */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .tag-crimson {
+            background: rgba(220, 38, 38, .15);
+            color: #F87171;
+            border: 1px solid rgba(220, 38, 38, .2);
+        }
+
+        .tag-violet {
+            background: rgba(124, 58, 237, .15);
+            color: #A78BFA;
+            border: 1px solid rgba(124, 58, 237, .2);
+        }
+
+        .tag-blue {
+            background: rgba(96, 165, 250, .1);
+            color: #93C5FD;
+            border: 1px solid rgba(96, 165, 250, .2);
+        }
+
+        .tag-gray {
+            background: var(--surface2);
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+
+        /* ── CONNECT LINKS ── */
+        .connect-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .connect-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all .15s;
+            cursor: pointer;
+        }
+
+        .connect-item:hover {
+            border-color: rgba(124, 58, 237, .4);
+        }
+
+        .connect-icon {
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .connect-info {
+            flex: 1;
+        }
+
+        .connect-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .connect-val {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 1px;
+        }
+
+        .connect-add {
+            font-size: 10px;
+            color: #A78BFA;
+        }
+
+        /* ── CERT ITEMS ── */
+        .cert-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cert-item:last-child {
+            border-bottom: none;
+        }
+
+        .cert-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .cert-name {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .cert-platform {
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .cert-year {
+            font-size: 11px;
+            color: var(--muted);
+            margin-left: auto;
+        }
+
+        .add-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: 1px dashed rgba(124, 58, 237, .4);
+            border-radius: 10px;
+            color: #A78BFA;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all .15s;
+        }
+
+        .add-btn:hover {
+            background: rgba(124, 58, 237, .08);
+            border-style: solid;
+        }
+
+        /* ── BADGES ── */
+        .badge-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+        }
+
+        .badge-icon {
+            font-size: 18px;
+        }
+
+        .badge-name {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-sub {
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        /* ── STRENGTH ICONS ── */
+        .strength-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .strength-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            background: var(--surface2);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            min-width: 80px;
+        }
+
+        .strength-icon {
+            font-size: 24px;
+        }
+
+        .strength-label {
+            font-size: 10px;
+            color: var(--muted);
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        /* ── MODAL ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .7);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+        }
+
+        .modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--muted);
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .form-field {
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 6px;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus,
+        .form-select:focus {
+            border-color: rgba(124, 58, 237, .6);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-input::placeholder,
+        .form-textarea::placeholder {
+            color: var(--muted);
+        }
+
+        .form-select option {
+            background: #0E0C1A;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: opacity .2s;
+        }
+
+        .save-btn:hover {
+            opacity: .9;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all .3s;
+            z-index: 200;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 1000px) {
+
+            .grid2,
+            .grid21,
+            .grid12,
+            .grid3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 16px;
+            }
+        }
+
+        /* PREMIUM DESKTOP UPGRADES */
+        .sidebar {
+            overflow-y: auto;
+        }
+
+        .main {
+            width: 100%;
+        }
+
+        .hero-card,
+        .sec {
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .hero-card:hover,
+        .sec:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, .28);
+        }
+
+        .grid21 {
+            grid-template-columns: minmax(0, 2fr) minmax(340px, 1fr);
+        }
+
+        .hero-inner {
+            justify-content: space-between;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(124, 58, 237, .35);
+            border-radius: 20px
+        }
+
+        @media (min-width:1400px) {
+            .main {
+                max-width: 1600px;
+                padding: 36px 42px;
+            }
+        }
+
+        /* ============================================
+   PASTE THIS INSIDE YOUR EXISTING <style> TAG
+   Replace/update the relevant sections
+   ============================================ */
+
+        /* ── BETTER FONTS ── */
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.01em;
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        .sec-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .hero-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        .info-val {
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .info-label {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.06em;
+        }
+
+        .sp-val {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* ── FIXED LIGHT MODE ── */
+        [data-theme="light"] {
+            --bg: #F7F5FF;
+            --surface: #FFFFFF;
+            --surface2: #F0EEFF;
+            --border: rgba(124, 58, 237, 0.12);
+            --text: #0F0D1F;
+            --muted: #6B6A8A;
+        }
+
+        [data-theme="light"] .sidebar {
+            background: #FFFFFF;
+            border-right: 1px solid rgba(124, 58, 237, 0.1);
+            box-shadow: 2px 0 12px rgba(124, 58, 237, 0.06);
+        }
+
+        [data-theme="light"] .nav-item:hover {
+            background: rgba(124, 58, 237, 0.08);
+        }
+
+        [data-theme="light"] .nav-item.active {
+            background: rgba(220, 38, 38, 0.08);
+            color: #DC2626;
+        }
+
+        [data-theme="light"] .hero-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(124, 58, 237, 0.15);
+            box-shadow: 0 4px 24px rgba(124, 58, 237, 0.08);
+        }
+
+        [data-theme="light"] .sec {
+            background: #FFFFFF;
+            border: 1px solid rgba(124, 58, 237, 0.1);
+            box-shadow: 0 2px 12px rgba(124, 58, 237, 0.05);
+        }
+
+        [data-theme="light"] .info-item {
+            background: #F7F5FF;
+            border: 1px solid rgba(124, 58, 237, 0.08);
+        }
+
+        [data-theme="light"] .score-pill {
+            background: #F7F5FF;
+            border: 1px solid rgba(124, 58, 237, 0.12);
+        }
+
+        [data-theme="light"] .badge {
+            background: #F7F5FF;
+            border: 1px solid rgba(124, 58, 237, 0.12);
+        }
+
+        [data-theme="light"] .strength-item {
+            background: #F7F5FF;
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+
+        [data-theme="light"] .connect-item {
+            background: #F7F5FF;
+            border: 1px solid rgba(124, 58, 237, 0.1);
+        }
+
+        [data-theme="light"] .bar-track {
+            background: #EDE9FF;
+        }
+
+        [data-theme="light"] .u-name,
+        [data-theme="light"] .connect-label {
+            color: #0F0D1F;
+        }
+
+        [data-theme="light"] .logo {
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        [data-theme="light"] .add-btn {
+            border-color: rgba(124, 58, 237, 0.3);
+            color: #7C3AED;
+        }
+
+        [data-theme="light"] .add-btn:hover {
+            background: rgba(124, 58, 237, 0.06);
+        }
+
+        [data-theme="light"] .modal {
+            background: #FFFFFF;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        [data-theme="light"] .form-input,
+        [data-theme="light"] .form-textarea,
+        [data-theme="light"] .form-select {
+            background: #F7F5FF;
+            border-color: rgba(124, 58, 237, 0.2);
+            color: #0F0D1F;
+        }
+
+        [data-theme="light"] .form-select option {
+            background: #FFFFFF;
+            color: #0F0D1F;
+        }
+
+        /* ── STRENGTH PROFILE — upgraded ── */
+        .strength-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        .strength-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 10px;
+            background: var(--surface2);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            min-width: unset;
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s, box-shadow .2s;
+            cursor: default;
+        }
+
+        .strength-item::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            opacity: 0;
+            transition: opacity .2s;
+        }
+
+        .strength-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.15);
+        }
+
+        .strength-item:hover::before {
+            opacity: 1;
+        }
+
+        .strength-icon {
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .strength-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text);
+            text-align: center;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+        }
+
+        .strength-sublabel {
+            font-size: 10px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        /* ── ACHIEVEMENTS — upgraded ── */
+        .badge-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s, border-color .2s;
+        }
+
+        .badge::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, #DC2626, #7C3AED);
+            border-radius: 99px 0 0 99px;
+        }
+
+        .badge:hover {
+            transform: translateX(3px);
+            border-color: rgba(220, 38, 38, 0.3);
+        }
+
+        .badge-icon-wrap {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .badge-name {
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            color: var(--text);
+        }
+
+        .badge-sub {
+            font-size: 10px;
+            color: var(--muted);
+            margin-top: 1px;
+        }
+    </style>
+    <script>
+        (function () {
+            const theme = localStorage.getItem('ssip-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="sb-top">
+            <div class="logo">SSIP</div>
+            <div class="logo-sub">Intelligence Platform</div>
+        </div>
+        <div class="nav">
+            <div class="nav-label">Main</div>
+            <a href="/" class="nav-item">🏠 Dashboard</a>
+            <a href="/profile" class="nav-item active">👤 Profile</a>
+            <a href="/analytics" class="nav-item">📊 Analytics</a>
+            <div class="nav-label">AI Features</div>
+            <a href="/ai-mentor" class="nav-item">🤖 AI Mentor</a>
+            <a href="/study-planner" class="nav-item">📅 Study Planner</a>
+            <a href="/placement" class="nav-item">🏆 Placement</a>
+            <a href="/career" class="nav-item">🎯 Career Path</a>
+            <div class="nav-label">Tools</div>
+            <a href="/skills" class="nav-item">⚡ Skills</a>
+            <a href="/reports" class="nav-item">📄 Reports</a>
+        </div>
+        <div class="sb-footer">
+            <div class="user-row">
+                <div class="avatar">{{ session['user'][0].upper() }}</div>
+                <div>
+                    <div class="u-name">{{ session.get('user_name', session['user']).split()[0] }}</div>
+                    <div class="u-role">Student</div>
+                </div>
+            </div>
+            <a href="/logout" class="logout">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div>
+                <div class="page-title">My Profile</div>
+                <div class="page-sub">Your academic identity and professional journey</div>
+            </div>
+            <div class="topbar-right">
+                <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">🌓</button>
+                <button class="btn btn-outline" onclick="openModal('career-modal')">✏️ Edit Profile</button>
+            </div>
+        </div>
+
+        <!-- HERO CARD -->
+        <div class="hero-card">
+            <div class="hero-inner">
+                <div class="hero-avatar-wrap">
+                    <div class="hero-avatar">{{ session.get('user_name', 'S')[0].upper() }}</div>
+                </div>
+                <div class="hero-info">
+                    <div class="hero-name">
+                        {{ session.get('user_name', session['user']) }} ✓
+                    </div>
+                    <div class="hero-meta">
+                        <span>🎓 {{ profile['branch'] if profile and profile['branch'] else session.get('user_branch',
+                            'AI Engineering') }}</span>
+                        <span>📅 Semester {{ profile['semester'] if profile and profile['semester'] else '3' }}</span>
+                        <span>✉️ {{ session.get('user_email', '') }}</span>
+                    </div>
+                    {% if profile and profile['persona'] %}
+                    <div class="persona-chip">🏆 {{ profile['persona'] }}</div>
+                    {% endif %}
+                    <div class="hero-scores">
+                        <div class="score-pill">
+                            <div>
+                                <div class="sp-label">Success</div>
+                                <div class="sp-val crimson">{{ profile['success_score'] if profile and
+                                    profile['success_score'] else '—' }}<span
+                                        style="font-size:11px;opacity:.5">/100</span></div>
+                            </div>
+                        </div>
+                        <div class="score-pill">
+                            <div>
+                                <div class="sp-label">Risk</div>
+                                <div class="sp-val green">{{ profile['academic_risk'] if profile and
+                                    profile['academic_risk'] else '—' }}</div>
+                            </div>
+                        </div>
+                        <div class="score-pill">
+                            <div>
+                                <div class="sp-label">Placement</div>
+                                <div class="sp-val violet">{{ profile['placement_readiness'] if profile and
+                                    profile['placement_readiness'] else '—' }}%</div>
+                            </div>
+                        </div>
+                        <div class="score-pill">
+                            <div>
+                                <div class="sp-label">CGPA</div>
+                                <div class="sp-val amber">{{ profile['cgpa'] if profile and profile['cgpa'] else '—' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 1: Academic Info + Skill Radar -->
+        <div class="grid21">
+
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">📚 Academic Information</div>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">CGPA</div>
+                        <div class="info-val amber">{{ profile['cgpa'] if profile and profile['cgpa'] else '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Attendance</div>
+                        <div class="info-val green">{{ profile['attendance'] if profile and profile['attendance'] else
+                            '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Strong Area</div>
+                        <div class="info-val" style="font-size:12px">{{ profile['strong_area'] if profile and
+                            profile['strong_area'] else '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Weak Area</div>
+                        <div class="info-val crimson" style="font-size:12px">{{ profile['weak_area'] if profile and
+                            profile['weak_area'] else '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Backlog</div>
+                        <div
+                            class="info-val {% if profile and profile['backlog'] == 'Yes' %}crimson{% else %}green{% endif %}">
+                            {{ profile['backlog'] if profile and profile['backlog'] else '—' }}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Academic Risk</div>
+                        <div
+                            class="info-val {% if profile and profile['academic_risk'] == 'Low' %}green{% elif profile and profile['academic_risk'] == 'Medium' %}amber{% else %}crimson{% endif %}">
+                            {{ profile['academic_risk'] if profile and profile['academic_risk'] else '—' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">🕸️ Skills Radar</div>
+                </div>
+                <canvas id="radarChart" height="180"></canvas>
+            </div>
+        </div>
+
+        <!-- ROW 2: Academic Journey + Skill Bars -->
+        <div class="grid2">
+
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">📈 Academic Journey</div>
+                    <button class="sec-edit" onclick="openModal('journey-modal')">+ Add SGPA</button>
+                </div>
+                <div id="journey-list">
+                    <div class="journey-item">
+                        <div class="j-dot" style="background:#6B6A8A"></div>
+                        <div class="j-sem">Sem 1</div>
+                        <div class="j-data">
+                            <div class="j-cgpa" id="sem1-val">—</div>
+                            <div class="j-label">SGPA</div>
+                        </div>
+                        <span class="j-badge j-done" id="sem1-badge" style="display:none">Done</span>
+                    </div>
+                    <div class="journey-item">
+                        <div class="j-dot" style="background:#6B6A8A"></div>
+                        <div class="j-sem">Sem 2</div>
+                        <div class="j-data">
+                            <div class="j-cgpa" id="sem2-val">—</div>
+                            <div class="j-label">SGPA</div>
+                        </div>
+                        <span class="j-badge j-done" id="sem2-badge" style="display:none">Done</span>
+                    </div>
+                    <div class="journey-item">
+                        <div class="j-dot" style="background:#DC2626"></div>
+                        <div class="j-sem">Sem 3</div>
+                        <div class="j-data">
+                            <div class="j-cgpa" style="color:#F87171">{{ profile['cgpa'] if profile and profile['cgpa']
+                                else '—' }}</div>
+                            <div class="j-label">Current CGPA</div>
+                        </div>
+                        <span class="j-badge j-ongoing">Ongoing</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">⚡ Skill Snapshot</div>
+                </div>
+                {% if profile %}
+                <div class="skill-row">
+                    <div class="skill-top"><span>Coding</span><span>{{ profile['coding_skill'] }}/5</span></div>
+                    <div class="bar-track">
+                        <div class="bar-fill"
+                            style="width:{{ (profile['coding_skill'] or 0)*20 }}%;background:linear-gradient(90deg,#DC2626,#7C3AED)">
+                        </div>
+                    </div>
+                </div>
+                <div class="skill-row">
+                    <div class="skill-top"><span>Problem Solving</span><span>{{ profile['problem_solving'] }}/5</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill"
+                            style="width:{{ (profile['problem_solving'] or 0)*20 }}%;background:linear-gradient(90deg,#7C3AED,#60A5FA)">
+                        </div>
+                    </div>
+                </div>
+                <div class="skill-row">
+                    <div class="skill-top"><span>Communication</span><span>{{ profile['communication'] }}/5</span></div>
+                    <div class="bar-track">
+                        <div class="bar-fill"
+                            style="width:{{ (profile['communication'] or 0)*20 }}%;background:linear-gradient(90deg,#FBBF24,#DC2626)">
+                        </div>
+                    </div>
+                </div>
+                <div class="skill-row">
+                    <div class="skill-top"><span>Teamwork</span><span>{{ profile['teamwork'] }}/5</span></div>
+                    <div class="bar-track">
+                        <div class="bar-fill"
+                            style="width:{{ (profile['teamwork'] or 0)*20 }}%;background:linear-gradient(90deg,#22C55E,#60A5FA)">
+                        </div>
+                    </div>
+                </div>
+                <div class="skill-row">
+                    <div class="skill-top"><span>Project Building</span><span>{{ profile['project_skill'] }}/5</span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill"
+                            style="width:{{ (profile['project_skill'] or 0)*20 }}%;background:linear-gradient(90deg,#F87171,#FBBF24)">
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div style="text-align:center;padding:2rem;color:var(--muted);font-size:13px">Complete profile to see
+                    skills</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ROW 3: Career Vision + Technologies -->
+        <div class="grid2">
+
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">🎯 Career Vision</div>
+                    <button class="sec-edit" onclick="openModal('career-modal')">Edit</button>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Career Goal</div>
+                        <div class="info-val violet" style="font-size:12px" id="cv-goal">
+                            {{ profile['career_goal'][:35] if profile and profile['career_goal'] else 'Not set' }}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Placement Confidence</div>
+                        <div class="info-val amber">{{ profile['placement_confidence'] if profile and
+                            profile['placement_confidence'] else '—' }}/5</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Skill to Improve</div>
+                        <div class="info-val" style="font-size:11px" id="cv-skill">
+                            {{ profile['biggest_challenge'] if profile and profile['biggest_challenge'] else '—' }}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Study Hours/day</div>
+                        <div class="info-val">{{ profile['study_hours'] if profile and profile['study_hours'] else '—'
+                            }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">💻 Technologies & Interests</div>
+                </div>
+                <div class="tags" id="tech-tags">
+                    {% if profile and profile['technologies'] %}
+                    {% for tech in profile['technologies'].split(',') %}
+                    {% set t = tech.strip() %}
+                    {% if t %}
+                    <span
+                        class="tag {% if loop.index % 3 == 0 %}tag-violet{% elif loop.index % 2 == 0 %}tag-blue{% else %}tag-crimson{% endif %}">{{
+                        t }}</span>
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    <span style="font-size:12px;color:var(--muted)">No technologies added yet</span>
+                    {% endif %}
+                </div>
+                <div style="margin-top:14px">
+                    <div class="info-label" style="margin-bottom:6px">Coding Practice</div>
+                    <span class="tag tag-violet">{{ profile['coding_frequency'] if profile and
+                        profile['coding_frequency'] else '—' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 4: About Me + Connect -->
+        <div class="grid2">
+
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">👤 About Me</div>
+                    <button class="sec-edit" onclick="openModal('about-modal')">Edit</button>
+                </div>
+                <div id="about-text" style="font-size:13px;color:var(--muted);line-height:1.7">
+                    Tell others about your academic journey and goals. Click Edit to write your bio.
+                </div>
+            </div>
+
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">🔗 Connect & Links</div>
+                    <button class="sec-edit" onclick="openModal('links-modal')">Edit</button>
+                </div>
+                <div class="connect-grid">
+                    <div class="connect-item" id="link-linkedin">
+                        <div class="connect-icon">💼</div>
+                        <div class="connect-info">
+                            <div class="connect-label">LinkedIn</div>
+                            <div class="connect-val connect-add">+ Connect</div>
+                        </div>
+                    </div>
+                    <div class="connect-item" id="link-github">
+                        <div class="connect-icon">🐙</div>
+                        <div class="connect-info">
+                            <div class="connect-label">GitHub</div>
+                            <div class="connect-val connect-add">+ Connect</div>
+                        </div>
+                    </div>
+                    <div class="connect-item" id="link-leetcode">
+                        <div class="connect-icon">🧩</div>
+                        <div class="connect-info">
+                            <div class="connect-label">LeetCode</div>
+                            <div class="connect-val connect-add">+ Connect</div>
+                        </div>
+                    </div>
+                    <div class="connect-item" id="link-portfolio">
+                        <div class="connect-icon">🌐</div>
+                        <div class="connect-info">
+                            <div class="connect-label">Portfolio</div>
+                            <div class="connect-val connect-add">+ Connect</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 5: Certifications + Learning -->
+        <div class="grid2">
+
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">🎖️ Certifications</div>
+                    <button class="sec-edit" onclick="openModal('cert-modal')">+ Add</button>
+                </div>
+                <div id="cert-list">
+                    <div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:12px">
+                        No certificates added yet.<br>Add your NPTEL, Coursera, Google certifications.
+                    </div>
+                </div>
+                <button class="add-btn" onclick="openModal('cert-modal')">+ Add Certificate</button>
+            </div>
+
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">📖 Learning Habits</div>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Projects Done</div>
+                        <div class="info-val violet">{{ profile['projects_completed'] if profile and
+                            profile['projects_completed'] else '—' }}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Study Hours</div>
+                        <div class="info-val">{{ profile['study_hours'] if profile and profile['study_hours'] else '—'
+                            }}</div>
+                    </div>
+                    <div class="info-item" style="grid-column: span 2">
+                        <div class="info-label">Biggest Challenge</div>
+                        <div class="info-val crimson" style="font-size:12px">{{ profile['biggest_challenge'] if profile
+                            and profile['biggest_challenge'] else '—' }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 6: Strengths + Badges -->
+        <!-- ══════════════════════════════════════════
+   ROW 6: STRENGTH PROFILE + ACHIEVEMENTS
+   Replace your existing ROW 6 grid2 div with this
+══════════════════════════════════════════ -->
+
+        <div class="grid2">
+
+            <!-- STRENGTH PROFILE -->
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">💪 Strength Profile</div>
+                    <span style="font-size:11px;color:var(--muted)">Based on your data</span>
+                </div>
+                <div class="strength-grid">
+                    {% if profile %}
+                    {% if (profile['problem_solving'] or 0) >= 4 %}
+                    <div class="strength-item">
+                        <div class="strength-icon">🧠</div>
+                        <div class="strength-label">Analytical Thinking</div>
+                        <div class="strength-sublabel">{{ profile['problem_solving'] }}/5</div>
+                    </div>
+                    {% endif %}
+                    {% if (profile['communication'] or 0) >= 4 %}
+                    <div class="strength-item">
+                        <div class="strength-icon">💬</div>
+                        <div class="strength-label">Communication</div>
+                        <div class="strength-sublabel">{{ profile['communication'] }}/5</div>
+                    </div>
+                    {% endif %}
+                    {% if (profile['teamwork'] or 0) >= 4 %}
+                    <div class="strength-item">
+                        <div class="strength-icon">🤝</div>
+                        <div class="strength-label">Teamwork</div>
+                        <div class="strength-sublabel">{{ profile['teamwork'] }}/5</div>
+                    </div>
+                    {% endif %}
+                    {% if (profile['project_skill'] or 0) >= 4 %}
+                    <div class="strength-item">
+                        <div class="strength-icon">🚀</div>
+                        <div class="strength-label">Project Building</div>
+                        <div class="strength-sublabel">{{ profile['project_skill'] }}/5</div>
+                    </div>
+                    {% endif %}
+                    {% if (profile['coding_skill'] or 0) >= 4 %}
+                    <div class="strength-item">
+                        <div class="strength-icon">💻</div>
+                        <div class="strength-label">Coding</div>
+                        <div class="strength-sublabel">{{ profile['coding_skill'] }}/5</div>
+                    </div>
+                    {% endif %}
+                    {% if (profile['cgpa'] or 0) >= 8.5 %}
+                    <div class="strength-item">
+                        <div class="strength-icon">🎓</div>
+                        <div class="strength-label">Academic Excellence</div>
+                        <div class="strength-sublabel">CGPA {{ profile['cgpa'] }}</div>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div style="color:var(--muted);font-size:12px;grid-column:span 3">Complete profile to see strengths
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ACHIEVEMENTS -->
+            <div class="sec">
+                <div class="sec-header">
+                    <div class="sec-title">🏆 Achievements</div>
+                    <span style="font-size:11px;color:var(--muted)">Earned badges</span>
+                </div>
+                <div class="badge-grid">
+                    {% if profile %}
+                    {% if (profile['cgpa'] or 0) >= 8.5 %}
+                    <div class="badge">
+                        <div class="badge-icon-wrap" style="background:rgba(251,191,36,.15)">🌟</div>
+                        <div>
+                            <div class="badge-name">Academic Achiever</div>
+                            <div class="badge-sub">CGPA ≥ 8.5 · Top performer</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if profile['attendance'] in ['95-100%', '85-94%'] %}
+                    <div class="badge">
+                        <div class="badge-icon-wrap" style="background:rgba(74,222,128,.12)">✅</div>
+                        <div>
+                            <div class="badge-name">High Attendance</div>
+                            <div class="badge-sub">{{ profile['attendance'] }} · Consistent</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if profile['projects_completed'] not in ['0', None, ''] %}
+                    <div class="badge">
+                        <div class="badge-icon-wrap" style="background:rgba(124,58,237,.15)">🚀</div>
+                        <div>
+                            <div class="badge-name">Project Builder</div>
+                            <div class="badge-sub">{{ profile['projects_completed'] }} projects done</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if ((profile['coding_skill'] or 0) + (profile['problem_solving'] or 0) +
+                    (profile['communication'] or 0)) >= 11 %}
+                    <div class="badge">
+                        <div class="badge-icon-wrap" style="background:rgba(220,38,38,.12)">⚡</div>
+                        <div>
+                            <div class="badge-name">Skilled Learner</div>
+                            <div class="badge-sub">Avg skills ≥ 3.7/5</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if (profile['teamwork'] or 0) >= 4 %}
+                    <div class="badge">
+                        <div class="badge-icon-wrap" style="background:rgba(96,165,250,.12)">🤝</div>
+                        <div>
+                            <div class="badge-name">Team Player</div>
+                            <div class="badge-sub">Collaboration score {{ profile['teamwork'] }}/5</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if profile['attendance'] == '95-100%' and (profile['cgpa'] or 0) >= 8.0 %}
+                    <div class="badge">
+                        <div class="badge-icon-wrap" style="background:rgba(220,38,38,.12)">🔥</div>
+                        <div>
+                            <div class="badge-name">On Fire</div>
+                            <div class="badge-sub">High CGPA + Full attendance</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div style="color:var(--muted);font-size:12px;grid-column:span 2">Badges appear based on your
+                        profile data</div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+        </div>
+
+    </main>
+
+    <!-- ══ MODALS ══ -->
+
+    <!-- Career Vision Edit -->
+    <div class="modal-overlay" id="career-modal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('career-modal')">✕</button>
+            <div class="modal-title">Edit Career Vision</div>
+            <div class="form-field">
+                <label class="form-label">Career Goal</label>
+                <input class="form-input" id="inp-career" placeholder="e.g. AI Engineer at Google">
+            </div>
+            <div class="form-field">
+                <label class="form-label">Dream Company</label>
+                <input class="form-input" id="inp-company" placeholder="e.g. Google, OpenAI, Microsoft">
+            </div>
+            <div class="form-field">
+                <label class="form-label">Long-term Goal</label>
+                <input class="form-input" id="inp-longterm" placeholder="e.g. Build AI products that create impact">
+            </div>
+            <button class="save-btn" onclick="saveCareer()">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- About Me Edit -->
+    <div class="modal-overlay" id="about-modal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('about-modal')">✕</button>
+            <div class="modal-title">Edit About Me</div>
+            <div class="form-field">
+                <label class="form-label">Bio</label>
+                <textarea class="form-textarea" id="inp-bio"
+                    placeholder="Write 2-3 lines about yourself, your interests, and goals..."></textarea>
+            </div>
+            <button class="save-btn" onclick="saveBio()">Save</button>
+        </div>
+    </div>
+
+    <!-- Links Edit -->
+    <div class="modal-overlay" id="links-modal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('links-modal')">✕</button>
+            <div class="modal-title">Connect & Links</div>
+            <div class="form-field">
+                <label class="form-label">LinkedIn URL</label>
+                <input class="form-input" id="inp-linkedin" placeholder="https://linkedin.com/in/yourname">
+            </div>
+            <div class="form-field">
+                <label class="form-label">GitHub URL</label>
+                <input class="form-input" id="inp-github" placeholder="https://github.com/yourname">
+            </div>
+            <div class="form-field">
+                <label class="form-label">LeetCode URL</label>
+                <input class="form-input" id="inp-leetcode" placeholder="https://leetcode.com/yourname">
+            </div>
+            <div class="form-field">
+                <label class="form-label">Portfolio URL</label>
+                <input class="form-input" id="inp-portfolio" placeholder="https://yourname.dev">
+            </div>
+            <button class="save-btn" onclick="saveLinks()">Save Links</button>
+        </div>
+    </div>
+
+    <!-- Add Certificate -->
+    <div class="modal-overlay" id="cert-modal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('cert-modal')">✕</button>
+            <div class="modal-title">Add Certificate</div>
+            <div class="form-field">
+                <label class="form-label">Certificate Name</label>
+                <input class="form-input" id="inp-cert-name" placeholder="e.g. Python for Everybody">
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label class="form-label">Platform</label>
+                    <select class="form-select" id="inp-cert-platform">
+                        <option value="">Select</option>
+                        <option>Coursera</option>
+                        <option>NPTEL</option>
+                        <option>Google</option>
+                        <option>Microsoft</option>
+                        <option>Udemy</option>
+                        <option>LinkedIn Learning</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Year</label>
+                    <input class="form-input" id="inp-cert-year" placeholder="2024" type="number" min="2000" max="2030">
+                </div>
+            </div>
+            <button class="save-btn" onclick="addCertificate()">Add Certificate</button>
+        </div>
+    </div>
+
+    <!-- Academic Journey Edit -->
+    <div class="modal-overlay" id="journey-modal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal('journey-modal')">✕</button>
+            <div class="modal-title">Add Semester SGPA</div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label class="form-label">Semester</label>
+                    <select class="form-select" id="inp-sem">
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label class="form-label">SGPA</label>
+                    <input class="form-input" id="inp-sgpa" placeholder="e.g. 8.2" type="number" min="0" max="10"
+                        step="0.01">
+                </div>
+            </div>
+            <button class="save-btn" onclick="saveJourney()">Save SGPA</button>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">✓ Saved successfully!</div>
+
+    <script>
+        // ── RADAR CHART ──
+        const ctx = document.getElementById('radarChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Coding', 'Problem Solving', 'Communication', 'Teamwork', 'Project Building'],
+                datasets: [{
+                    label: 'Skills',
+                    data: [
+                        {{ profile['coding_skill'] if profile and profile['coding_skill'] else 0 }},
+                {{ profile['problem_solving'] if profile and profile['problem_solving'] else 0 }},
+                {{ profile['communication'] if profile and profile['communication'] else 0 }},
+            {{ profile['teamwork'] if profile and profile['teamwork'] else 0 }},
+            {{ profile['project_skill'] if profile and profile['project_skill'] else 0 }}
+            ],
+            backgroundColor: 'rgba(220,38,38,0.15)',
+            borderColor: '#DC2626',
+            borderWidth: 2,
+            pointBackgroundColor: '#7C3AED',
+            pointBorderColor: '#DC2626',
+            pointRadius: 4
+        }]
+    },
+            options: {
+            responsive: true,
+            scales: {
+                r: {
+                    min: 0, max: 5,
+                    ticks: { stepSize: 1, color: '#6B6A8A', font: { size: 10 } },
+                    grid: { color: 'rgba(255,255,255,0.06)' },
+                    pointLabels: { color: '#F0EEFF', font: { size: 11 } },
+                    angleLines: { color: 'rgba(255,255,255,0.06)' }
+                }
+            },
+            plugins: { legend: { display: false } }
+        }
+});
+
+        // ── THEME TOGGLE ──
+        function toggleTheme() {
+            const body = document.body;
+            const current = body.getAttribute('data-theme');
+            body.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+            localStorage.setItem('ssip-theme', body.getAttribute('data-theme'));
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('ssip-theme') || 'dark';
+            document.body.setAttribute('data-theme', saved);
+            loadLocal();
+        });
+
+        // ── MODAL HELPERS ──
+        function openModal(id) {
+            document.getElementById(id).classList.add('open');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(m => {
+            m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+        });
+
+        // ── TOAST ──
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        // ── LOCAL STORAGE ──
+        function saveLocal(key, val) { localStorage.setItem('ssip_' + key, val); }
+        function getLocal(key) { return localStorage.getItem('ssip_' + key) || ''; }
+
+        function loadLocal() {
+            // Bio
+            const bio = getLocal('bio');
+            if (bio) document.getElementById('about-text').textContent = bio;
+
+            // Links
+            ['linkedin', 'github', 'leetcode', 'portfolio'].forEach(k => {
+                const val = getLocal('link_' + k);
+                const el = document.getElementById('link-' + k);
+                if (val && el) {
+                    el.querySelector('.connect-val').textContent = val.replace('https://', '');
+                    el.querySelector('.connect-val').classList.remove('connect-add');
+                    el.onclick = () => window.open(val, '_blank');
+                }
+            });
+
+            // Certs
+            const certs = JSON.parse(getLocal('certs') || '[]');
+            renderCerts(certs);
+
+            // Journey
+            ['1', '2'].forEach(s => {
+                const sgpa = getLocal('sem' + s + '_sgpa');
+                if (sgpa) {
+                    document.getElementById('sem' + s + '-val').textContent = sgpa;
+                    document.getElementById('sem' + s + '-val').style.color = '#4ADE80';
+                    document.getElementById('sem' + s + '-badge').style.display = 'inline';
+                }
+            });
+        }
+
+        // ── SAVE BIO ──
+        function saveBio() {
+            const val = document.getElementById('inp-bio').value.trim();
+            if (!val) return;
+            saveLocal('bio', val);
+            document.getElementById('about-text').textContent = val;
+            closeModal('about-modal');
+            showToast('Bio saved!');
+        }
+
+        // ── SAVE CAREER ──
+        function saveCareer() {
+            const goal = document.getElementById('inp-career').value.trim();
+            const company = document.getElementById('inp-company').value.trim();
+            if (goal) {
+                saveLocal('career_goal', goal);
+                document.getElementById('cv-goal').textContent = goal.slice(0, 35);
+            }
+            if (company) saveLocal('dream_company', company);
+            closeModal('career-modal');
+            showToast('Career vision saved!');
+        }
+
+        // ── SAVE LINKS ──
+        function saveLinks() {
+            ['linkedin', 'github', 'leetcode', 'portfolio'].forEach(k => {
+                const val = document.getElementById('inp-' + k).value.trim();
+                if (val) {
+                    saveLocal('link_' + k, val);
+                    const el = document.getElementById('link-' + k);
+                    el.querySelector('.connect-val').textContent = val.replace('https://', '');
+                    el.querySelector('.connect-val').classList.remove('connect-add');
+                    el.onclick = () => window.open(val, '_blank');
+                }
+            });
+            closeModal('links-modal');
+            showToast('Links saved!');
+        }
+
+        // ── CERTIFICATES ──
+        function addCertificate() {
+            const name = document.getElementById('inp-cert-name').value.trim();
+            const platform = document.getElementById('inp-cert-platform').value;
+            const year = document.getElementById('inp-cert-year').value;
+            if (!name || !platform) return;
+            const certs = JSON.parse(getLocal('certs') || '[]');
+            certs.push({ name, platform, year });
+            saveLocal('certs', JSON.stringify(certs));
+            renderCerts(certs);
+            closeModal('cert-modal');
+            showToast('Certificate added!');
+            document.getElementById('inp-cert-name').value = '';
+            document.getElementById('inp-cert-platform').value = '';
+            document.getElementById('inp-cert-year').value = '';
+        }
+
+        function removeCert(index) {
+            const certs = JSON.parse(getLocal('certs') || '[]');
+            certs.splice(index, 1);
+            saveLocal('certs', JSON.stringify(certs));
+            renderCerts(certs);
+            showToast('Certificate removed!');
+        }
+
+        function renderCerts(certs) {
+            const el = document.getElementById('cert-list');
+            if (!certs.length) {
+                el.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--muted);font-size:12px">No certificates yet.<br>Add your NPTEL, Coursera, Google certifications.</div>';
+                return;
+            }
+            const icons = {
+                'Coursera': '🎓', 'NPTEL': '🏛️', 'Google': '🔵',
+                'Microsoft': '🪟', 'Udemy': '🟣', 'LinkedIn Learning': '💼', 'Other': '📜'
+            };
+            el.innerHTML = certs.map((c, i) => `
+        <div class="cert-item" id="cert-${i}">
+            <div class="cert-icon" style="background:rgba(124,58,237,.15)">${icons[c.platform] || '📜'}</div>
+            <div style="flex:1">
+                <div class="cert-name">${c.name}</div>
+                <div class="cert-platform">${c.platform}${c.year ? ' · ' + c.year : ''}</div>
+            </div>
+            <button onclick="removeCert(${i})" style="
+                background:rgba(248,113,113,.1);
+                border:1px solid rgba(248,113,113,.3);
+                color:#F87171;
+                border-radius:6px;
+                padding:4px 10px;
+                font-size:11px;
+                cursor:pointer;"
+                onmouseover="this.style.background='rgba(248,113,113,.25)'"
+                onmouseout="this.style.background='rgba(248,113,113,.1)'">
+                ✕ Remove
+            </button>
+        </div>
+    `).join('');
+        }
+
+        // ── SAVE SGPA ──
+        function saveJourney() {
+            const sem = document.getElementById('inp-sem').value;
+            const sgpa = document.getElementById('inp-sgpa').value;
+            if (!sgpa) return;
+            saveLocal('sem' + sem + '_sgpa', sgpa);
+            document.getElementById('sem' + sem + '-val').textContent = sgpa;
+            document.getElementById('sem' + sem + '-val').style.color = '#4ADE80';
+            document.getElementById('sem' + sem + '-badge').style.display = 'inline';
+            closeModal('journey-modal');
+            showToast('SGPA saved!');
+        }
+    </script>
+
+</body>
+
+</html>

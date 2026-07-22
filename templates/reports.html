@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSIP — Reports</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg: #080810;
+            --surface: #0E0C1A;
+            --surface2: #13101F;
+            --border: rgba(255, 255, 255, 0.07);
+            --crimson: #DC2626;
+            --violet: #7C3AED;
+            --amber: #F59E0B;
+            --green: #22C55E;
+            --text: #F0EEFF;
+            --muted: #6B6A8A
+        }
+
+        [data-theme="light"] {
+            --bg: #F7F5FF;
+            --surface: #FFFFFF;
+            --surface2: #F0EEFF;
+            --border: rgba(124, 58, 237, 0.12);
+            --text: #0F0D1F;
+            --muted: #55536F
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            -webkit-font-smoothing: antialiased;
+            transition: background .3s, color .3s
+        }
+
+        /* ---------- SIDEBAR ---------- */
+        .sidebar {
+            width: 220px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 16px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 20;
+            overflow-y: auto
+        }
+
+        .sb-top {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .logo-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 1px;
+            letter-spacing: .05em
+        }
+
+        .nav {
+            padding: 0 10px
+        }
+
+        .nav-label {
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            padding: 8px 6px 3px
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 1px;
+            transition: all .15s
+        }
+
+        .nav-item:hover {
+            background: rgba(124, 58, 237, .1);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: rgba(220, 38, 38, .15);
+            color: #F87171
+        }
+
+        .sb-footer {
+            margin-top: auto;
+            padding: 12px 16px 0;
+            border-top: 1px solid var(--border)
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0
+        }
+
+        .u-name {
+            font-size: 12px;
+            font-weight: 600
+        }
+
+        .u-role {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .logout {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            color: #F87171;
+            font-size: 12px;
+            text-decoration: none;
+            margin-top: 6px;
+            font-weight: 500
+        }
+
+        .logout:hover {
+            background: rgba(248, 113, 113, .1)
+        }
+
+        /*  MAIN  */
+        .main {
+            margin-left: 220px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto
+        }
+
+        .topbar {
+            padding: 20px 28px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            background: var(--bg);
+            z-index: 10;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.03em
+        }
+
+        .page-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .theme-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px
+        }
+
+        .content {
+            padding: 22px 28px 44px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px
+        }
+
+        .card-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .card-title span.sub {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--muted)
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 10px;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 99px
+        }
+
+        /* STUDENT SUMMARY HERO */
+        .summary-hero {
+            background: linear-gradient(135deg, rgba(220, 38, 38, .12), rgba(124, 58, 237, .12));
+            border: 1px solid rgba(124, 58, 237, .3);
+            border-radius: 18px;
+            padding: 26px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap
+        }
+
+        .summary-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            flex-shrink: 0
+        }
+
+        .summary-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800
+        }
+
+        .summary-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px
+        }
+
+        .summary-chip {
+            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: 99px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-weight: 600
+        }
+
+        /*KEY-VALUE GRID (used by Academic / Career / Placement / Study) */
+        .kv-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 14px
+        }
+
+        .kv-item {
+            text-align: center;
+            padding: 16px 8px;
+            border-radius: 12px;
+            background: var(--surface2);
+            border: 1px solid var(--border)
+        }
+
+        .kv-num {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 800
+        }
+
+        .kv-num.green {
+            color: #4ADE80
+        }
+
+        .kv-num.amber {
+            color: #FBBF24
+        }
+
+        .kv-num.crimson {
+            color: #F87171
+        }
+
+        .kv-label {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 4px
+        }
+
+        /* SKILLS REPORT BARS (reuse skill-bar pattern) */
+        .skill-row {
+            margin-bottom: 14px
+        }
+
+        .skill-row:last-child {
+            margin-bottom: 0
+        }
+
+        .skill-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px
+        }
+
+        .skill-top .nums {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500
+        }
+
+        .skill-bar-bg {
+            height: 10px;
+            border-radius: 99px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            transition: width .6s ease
+        }
+
+        /* AI MENTOR INSIGHTS */
+        .insight-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            margin-bottom: 8px
+        }
+
+        .insight-row:last-child {
+            margin-bottom: 0
+        }
+
+        .insight-rank {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #DC2626, #7C3AED);
+            color: white;
+            font-size: 12px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0
+        }
+
+        .insight-topic {
+            font-size: 13px;
+            font-weight: 600
+        }
+
+        .insight-count {
+            margin-left: auto;
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 600
+        }
+
+        /* DOWNLOAD SECTION */
+        .download-card {
+            background: linear-gradient(135deg, rgba(220, 38, 38, .12), rgba(124, 58, 237, .12));
+            border: 1px solid rgba(124, 58, 237, .3);
+            border-radius: 18px;
+            padding: 28px;
+            text-align: center
+        }
+
+        .download-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 6px
+        }
+
+        .download-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 18px
+        }
+
+        .btn-download {
+            padding: 13px 28px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #DC2626, #7C3AED);
+            border: none;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity .15s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .btn-download:hover {
+            opacity: .9
+        }
+
+        .download-includes {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 18px
+        }
+
+        .include-chip {
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 99px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--muted)
+        }
+
+        @media (max-width: 700px) {
+            .summary-hero {
+                flex-direction: column;
+                text-align: center
+            }
+        }
+    </style>
+    <script>
+        (function () {
+            const theme = localStorage.getItem('ssip-theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+</head>
+
+<body>
+
+    <nav class="sidebar">
+        <div class="sb-top">
+            <div class="logo">SSIP</div>
+            <div class="logo-sub">Intelligence Platform</div>
+        </div>
+        <div class="nav">
+            <div class="nav-label">Main</div>
+            <a href="/" class="nav-item">🏠 Dashboard</a>
+            <a href="/profile" class="nav-item">👤 Profile</a>
+            <a href="/analytics" class="nav-item">📊 Analytics</a>
+            <div class="nav-label">AI Features</div>
+            <a href="/ai-mentor" class="nav-item">🤖 AI Mentor</a>
+            <a href="/study-planner" class="nav-item">📅 Study Planner</a>
+            <a href="/placement" class="nav-item">🏆 Placement</a>
+            <a href="/career" class="nav-item">🎯 Career Path</a>
+            <div class="nav-label">Tools</div>
+            <a href="/skills" class="nav-item">⚡ Skills</a>
+            <a href="/reports" class="nav-item active">📄 Reports</a>
+        </div>
+        <div class="sb-footer">
+            <div class="user-row">
+                <div class="avatar">{{ session['user'][0].upper() }}</div>
+                <div>
+                    <div class="u-name">{{ session.get('user_name', session['user']).split()[0] }}</div>
+                    <div class="u-role">Student · MITSGWL</div>
+                </div>
+            </div>
+            <a href="/logout" class="logout">🚪 Logout</a>
+        </div>
+    </nav>
+
+    <main class="main">
+        <div class="topbar">
+            <div>
+                <div class="page-title">📄 Reports</div>
+                <div class="page-sub" id="pageSub">Compiling your full performance summary...</div>
+            </div>
+            <div class="topbar-actions">
+                <button class="theme-btn" onclick="toggleTheme()">🌓</button>
+            </div>
+        </div>
+
+        <div class="content">
+
+            <!-- 1: STUDENT SUMMARY -->
+            <div class="summary-hero">
+                <div class="summary-avatar" id="summaryAvatar">–</div>
+                <div>
+                    <div class="summary-name" id="summaryName">–</div>
+                    <div class="summary-meta" id="summaryMeta"></div>
+                </div>
+            </div>
+
+            <!-- 2: ACADEMIC REPORT -->
+            <div class="card">
+                <div class="card-title">Academic Report</div>
+                <div class="kv-grid" id="academicGrid"></div>
+            </div>
+
+            <!-- 3: CAREER REPORT -->
+            <div class="card">
+                <div class="card-title">Career Report</div>
+                <div class="kv-grid" id="careerGrid"></div>
+            </div>
+
+            <!-- 4: SKILLS REPORT -->
+            <div class="card">
+                <div class="card-title">Skills Report</div>
+                <div id="skillsReportWrap">
+                    <div class="empty-state">Loading...</div>
+                </div>
+            </div>
+
+            <!-- 5: PLACEMENT REPORT -->
+            <div class="card">
+                <div class="card-title">Placement Report</div>
+                <div class="kv-grid" id="placementGrid"></div>
+            </div>
+
+            <!-- 6: STUDY PLANNER REPORT -->
+            <div class="card">
+                <div class="card-title">Study Planner Report</div>
+                <div class="kv-grid" id="studyGrid"></div>
+            </div>
+
+            <!-- 7: AI MENTOR INSIGHTS -->
+            <div class="card">
+                <div class="card-title">AI Mentor Insights<span class="sub">most discussed topics</span></div>
+                <div id="insightsWrap"></div>
+            </div>
+
+            <!-- 8: PERFORMANCE TREND -->
+            <div class="card">
+                <div class="card-title">Performance Trend<span class="sub">overall growth over time</span></div>
+                <canvas id="trendChart" height="140"></canvas>
+            </div>
+
+            <!-- 9: DOWNLOAD REPORT -->
+            <div class="download-card">
+                <div class="download-title">Your Full Report is Ready</div>
+                <div class="download-sub">Includes Student Summary, Academic, Career, Skills, Placement &amp; Study
+                    Progress</div>
+                <button class="btn-download" onclick="downloadReport()">📥 Download PDF Report</button>
+                <div class="download-includes">
+                    <span class="include-chip">Student Summary</span>
+                    <span class="include-chip">Academic Report</span>
+                    <span class="include-chip">Career Report</span>
+                    <span class="include-chip">Skill Report</span>
+                    <span class="include-chip">Placement Report</span>
+                    <span class="include-chip">Study Progress</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        let trendChartInstance = null;
+        let lastData = null;
+
+        function toggleTheme() {
+            const b = document.body;
+            b.setAttribute('data-theme', b.getAttribute('data-theme') === 'light' ? 'dark' : 'light');
+            localStorage.setItem('ssip-theme', b.getAttribute('data-theme'));
+            if (lastData) renderTrend(lastData.performance_trend);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.body.setAttribute('data-theme', localStorage.getItem('ssip-theme') || 'dark');
+            loadReportsData();
+        });
+
+        async function loadReportsData() {
+            try {
+                const res = await fetch('/reports/data');
+                const data = await res.json();
+                if (data.error) {
+                    document.getElementById('pageSub').textContent = data.error;
+                    return;
+                }
+                lastData = data;
+                document.getElementById('pageSub').textContent = 'A complete snapshot of your academic, career and placement journey';
+
+                renderSummary(data.student_summary);
+                renderAcademic(data.academic_report);
+                renderCareer(data.career_report);
+                renderSkillsReport(data.skills_report);
+                renderPlacement(data.placement_report);
+                renderStudy(data.study_planner_report);
+                renderInsights(data.ai_mentor_insights);
+                renderTrend(data.performance_trend);
+            } catch (e) {
+                document.getElementById('pageSub').textContent = 'Could not load report data — check Flask server.';
+                console.error(e);
+            }
+        }
+
+        function renderSummary(s) {
+            document.getElementById('summaryAvatar').textContent = (s.name || '?').charAt(0).toUpperCase();
+            document.getElementById('summaryName').textContent = s.name || '–';
+            document.getElementById('summaryMeta').innerHTML = `
+        <span class="summary-chip">🎓 ${s.branch || '–'}</span>
+        <span class="summary-chip">📚 Semester ${s.semester || '–'}</span>
+        <span class="summary-chip">⭐ CGPA ${s.cgpa ?? '–'}</span>
+        <span class="summary-chip">📅 ${s.attendance ?? '–'}% Attendance</span>
+        <span class="summary-chip">🎯 ${s.career_goal || '–'}</span>
+      `;
+        }
+
+        function renderAcademic(a) {
+            document.getElementById('academicGrid').innerHTML = `
+        <div class="kv-item"><div class="kv-num">${a.cgpa ?? '–'}</div><div class="kv-label">Current CGPA</div></div>
+        <div class="kv-item"><div class="kv-num green">${a.predicted_cgpa ?? '–'}</div><div class="kv-label">Predicted CGPA</div></div>
+        <div class="kv-item"><div class="kv-num">${a.attendance ?? '–'}%</div><div class="kv-label">Attendance</div></div>
+        <div class="kv-item"><div class="kv-num ${a.risk_level === 'Low' ? 'green' : a.risk_level === 'Medium' ? 'amber' : 'crimson'}">${a.risk_level || '–'}</div><div class="kv-label">Academic Risk</div></div>
+      `;
+        }
+
+        function renderCareer(c) {
+            document.getElementById('careerGrid').innerHTML = `
+        <div class="kv-item"><div class="kv-num">${c.career_goal || '–'}</div><div class="kv-label">Career Goal</div></div>
+        <div class="kv-item"><div class="kv-num green">${c.readiness ?? '–'}%</div><div class="kv-label">Career Readiness</div></div>
+        <div class="kv-item"><div class="kv-num amber">${c.match_score ?? '–'}%</div><div class="kv-label">Match Score</div></div>
+      `;
+        }
+
+        function renderSkillsReport(sk) {
+            const wrap = document.getElementById('skillsReportWrap');
+            const entries = Object.entries(sk || {});
+            if (!entries.length) { wrap.innerHTML = '<div class="empty-state">No skill data yet.</div>'; return; }
+            wrap.innerHTML = entries.map(([label, val]) => `
+        <div class="skill-row">
+          <div class="skill-top"><span>${label}</span><span class="nums">${val}%</span></div>
+          <div class="skill-bar-bg"><div class="skill-bar-fill" style="width:${val}%"></div></div>
+        </div>
+      `).join('');
+        }
+
+        function renderPlacement(p) {
+            document.getElementById('placementGrid').innerHTML = `
+        <div class="kv-item"><div class="kv-num green">${p.readiness ?? '–'}%</div><div class="kv-label">Placement Readiness</div></div>
+        <div class="kv-item"><div class="kv-num amber">${p.resume_score ?? '–'}%</div><div class="kv-label">Resume Score</div></div>
+        <div class="kv-item"><div class="kv-num">${p.projects_completed ?? '–'}</div><div class="kv-label">Projects Completed</div></div>
+        <div class="kv-item"><div class="kv-num">${p.certifications ?? '–'}</div><div class="kv-label">Certifications</div></div>
+      `;
+        }
+
+        function renderStudy(st) {
+            document.getElementById('studyGrid').innerHTML = `
+        <div class="kv-item"><div class="kv-num green">${st.tasks_completed ?? '–'}</div><div class="kv-label">Tasks Completed</div></div>
+        <div class="kv-item"><div class="kv-num crimson">${st.tasks_pending ?? '–'}</div><div class="kv-label">Tasks Pending</div></div>
+        <div class="kv-item"><div class="kv-num amber">${st.completion_rate ?? '–'}%</div><div class="kv-label">Completion Rate</div></div>
+      `;
+        }
+
+        function renderInsights(insights) {
+            const wrap = document.getElementById('insightsWrap');
+            if (!insights.length) { wrap.innerHTML = '<div class="empty-state">No AI Mentor conversations yet.</div>'; return; }
+            wrap.innerHTML = insights.map((i, idx) => `
+        <div class="insight-row">
+          <div class="insight-rank">${idx + 1}</div>
+          <div class="insight-topic">${i.topic}</div>
+          ${i.count !== undefined ? `<div class="insight-count">${i.count} chats</div>` : ''}
+        </div>
+      `).join('');
+        }
+
+        function renderTrend(trend) {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            const isLight = document.body.getAttribute('data-theme') === 'light';
+            const textColor = isLight ? '#55536F' : '#6B6A8A';
+
+            if (trendChartInstance) trendChartInstance.destroy();
+            const grad = ctx.createLinearGradient(0, 0, 0, 220);
+            grad.addColorStop(0, 'rgba(220, 38, 38, .3)');
+            grad.addColorStop(1, 'rgba(220, 38, 38, 0)');
+
+            trendChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: trend.labels,
+                    datasets: [{
+                        data: trend.data,
+                        borderColor: '#7C3AED',
+                        backgroundColor: grad,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: .35,
+                        pointBackgroundColor: '#DC2626',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: textColor }, grid: { display: false } },
+                        y: { min: 0, max: 100, ticks: { color: textColor, callback: v => v + '%' }, grid: { color: 'rgba(128,128,128,.1)' } }
+                    }
+                }
+            });
+        }
+
+        function downloadReport() {
+            window.location.href = '/reports/download-pdf';
+        }
+    </script>
+</body>
+
+</html>
