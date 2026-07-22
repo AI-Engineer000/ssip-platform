@@ -17,7 +17,19 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 _last_ai_call_ts = {}
-
+@app.route('/test-sheets')
+def test_sheets():
+    if 'user' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    email = session['user_email']
+    result = find_student_by_email(email)
+    
+    return jsonify({
+        'email': email,
+        'found': result is not None,
+        'data': result
+    })
 load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
