@@ -252,84 +252,76 @@ def signup():
 
 login_attempts = {}
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        password = request.form.get('password', '')
-
-        client_ip = request.remote_addr
-        if client_ip in login_attempts:
-            attempts, last_attempt = login_attempts[client_ip]
-            if attempts >= 5 and datetime.now() - last_attempt < timedelta(minutes=5):
-                return render_template('login.html',
-                                       error="Too many failed attempts. Please wait 5 minutes before trying again.")
-
-        # Validate input
-        if not username or not password:
-            return render_template('login.html', error="Please fill in all fields.")
-
-        # Database connection
-        conn = get_db()
-        user = conn.execute(
-            "SELECT * FROM users WHERE username = ? OR email = ?",
-            (username, username)
-        ).fetchone()
-        conn.close()
-
-        if not user:
-
-            if client_ip not in login_attempts:
-                login_attempts[client_ip] = [1, datetime.now()]
-            else:
-                login_attempts[client_ip][0] += 1
-                login_attempts[client_ip][1] = datetime.now()
-            return render_template('login.html', error="Invalid username or email.")
-
-        if not check_password_hash(user['password'], password):
-
-            if client_ip not in login_attempts:
-                login_attempts[client_ip] = [1, datetime.now()]
-            else:
-                login_attempts[client_ip][0] += 1
-                login_attempts[client_ip][1] = datetime.now()
-            return render_template('login.html', error="Invalid password.")
-
-        login_attempts.pop(client_ip, None)
-
-        # Set session
-        session.permanent = True
-        session['user'] = user['username']
-        session['user_id'] = user['id']
-        session['user_name'] = user['name']
-        session['user_email'] = user['email']
-        session['login_time'] = datetime.now().isoformat()
-
-        # Check if profile exists or not
-        conn = get_db()
-        profile = conn.execute(
-            "SELECT onboarding_done FROM student_profile WHERE user_id=?",
-            (user['id'],)
-        ).fetchone()
-        conn.close()
-
-        if profile and profile['onboarding_done'] == 1:
-            return redirect('/')
-
-        # Check Google Sheets for profile data
-        sheet_row = find_student_by_email(user['email'])
-
-        if sheet_row:
-            profile_data = map_row_to_profile(sheet_row, user['id'])
-            save_profile_to_db(profile_data)
-            return redirect('/')
-
-        return redirect('/complete-profile')
-
+        try:
+            username = request.form.get('username', '').strip()
+            password = request.form.get('password', '')
+            
+            print(f"Login attempt for username: {username}")
+            
+            if not username or not password:
+                return render_template('login.html', error="Please fill in all fields.")
+            
+            conn = get_db()
+            user = conn.execute(
+                "SELECT * FROM users WHERE username = ? OR email = ?",
+                (username, username)
+            ).fetchone()
+            conn.close()
+            
+            if not user:
+                print("User not found")
+                return render_template('login.html', error="Invalid username or email.")
+            
+            if not check_password_hash(user['password'], password):
+                print("Invalid password")
+                return render_template('login.html', error="Invalid password.")
+            
+            print(f"Login successful for user: {user['username']}")
+            
+            session.permanent = True
+            session['user'] = user['username']
+            session['user_id'] = user['id']
+            session['user_name'] = user['name']
+            session['user_email'] = user['email']
+            
+            # Check if profile exists
+            print("Checking profile...")
+            conn = get_db()
+            profile = conn.execute(
+                "SELECT onboarding_done FROM student_profile WHERE user_id=?",
+                (user['id'],)
+            ).fetchone()
+            conn.close()
+            
+            if profile and profile['onboarding_done'] == 1:
+                print("Profile exists, redirecting to dashboard")
+                return redirect('/')
+            
+            # Check Google Sheets
+            print("Checking Google Sheets...")
+            sheet_row = find_student_by_email(user['email'])
+            
+            if sheet_row:
+                print("Found in Google Sheets, saving profile...")
+                profile_data = map_row_to_profile(sheet_row, user['id'])
+                save_profile_to_db(profile_data)
+                print("Profile saved, redirecting to dashboard")
+                return redirect('/')
+            
+            print("No profile found, redirecting to complete-profile")
+            return redirect('/complete-profile')
+            
+        except Exception as e:
+            print(f"ERROR in login: {e}")
+            import traceback
+            traceback.print_exc()
+            return render_template('login.html', error="An error occurred. Please try again.")
+    
     return render_template('login.html')
-
-
+    
 @app.before_request
 def cleanup_login_attempts():
     """Remove login attempts older than 5 minutes"""
