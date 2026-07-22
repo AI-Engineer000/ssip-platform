@@ -4,7 +4,7 @@ import base64
 import gspread
 from google.oauth2.service_account import Credentials
 
-SHEET_ID = "1AAbTWXzOjfv2D6H0egOJP_6gAGAoOuuzYRhLFHIdfNg"
+SHEET_ID = "1Z7DK3kCkJEX-P-ddOD4e7_szK-iPADSpFEHi2wP9lN4"
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets.readonly",
     "https://www.googleapis.com/auth/drive.readonly"
@@ -15,43 +15,40 @@ def get_sheet():
         creds_b64 = os.getenv("GOOGLE_CREDENTIALS")
         
         if creds_b64:
-            print("Using credentials from environment variable")
-            try:
-                creds_data = base64.b64decode(creds_b64).decode('utf-8')
-                creds_dict = json.loads(creds_data)
-                creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
-            except Exception as e:
-                print(f"Error decoding credentials: {e}")
-                raise
+            creds_data = base64.b64decode(creds_b64).decode('utf-8')
+            creds_dict = json.loads(creds_data)
+            creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
         else:
-            print("GOOGLE_CREDENTIALS not found, trying credentials.json")
             with open("credentials.json", "r") as f:
                 creds_dict = json.load(f)
             creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
         
         client = gspread.authorize(creds)
         sheet = client.open_by_key(SHEET_ID).sheet1
-        print("Google Sheets connected successfully!")
         return sheet
     except Exception as e:
         print(f"Failed to connect to Google Sheets: {e}")
-        import traceback
-        traceback.print_exc()
         raise
 
 def find_student_by_email(email):
     try:
-        print(f"Looking for email: {email}")
         sheet = get_sheet()
         records = sheet.get_all_records()
-        print(f"Found {len(records)} records in sheet")
         email = email.strip().lower()
         
+        print(f"Looking for email: {email}")
+        print(f"Total records: {len(records)}")
+        
+        if records:
+            print("Column names in sheet:", list(records[0].keys()))
+        
         for idx, row in enumerate(records):
-            e1 = str(row.get("Email Address", "")).strip().lower()
-            e2 = str(row.get("College Email ID", "")).strip().lower()
-            if e1 == email or e2 == email:
-                print(f"Found student at row {idx}")
+            # Check both email columns
+            email1 = str(row.get("Email Address", "")).strip().lower()
+            email2 = str(row.get("College Email ID", "")).strip().lower()
+            
+            if email1 == email or email2 == email:
+                print(f"Found student at row {idx+2}")
                 return row
         
         print("Student not found in sheet")
@@ -63,7 +60,6 @@ def find_student_by_email(email):
         return None
 
 def map_row_to_profile(row, user_id):
-    # Your existing code here - keep it exactly as is
     def safe_int(val, default=0):
         try:
             return int(str(val).strip())
@@ -76,25 +72,33 @@ def map_row_to_profile(row, user_id):
         except:
             return default
     
+    def safe_str(val, default=""):
+        try:
+            return str(val).strip()
+        except:
+            return default
+    
+    # Map all fields with exact column names from your form
     coding_skill = safe_int(row.get("Rate your coding / technical skills.  ", 0))
     problem_solving = safe_int(row.get("Rate your problem-solving ability.  ", 0))
     communication = safe_int(row.get("Rate your communication skills.", 0))
     teamwork = safe_int(row.get("Rate your Teamwork & Collaboration Skills", 0))
-    project_skill = safe_int(row.get("Rate your project-building / practical implementation skills.   ", 0))
+    project_skill = safe_int(row.get("Rate your project-building / practical implementation skills.    ", 0))
     placement_conf = safe_int(row.get("How confident are you about your placement/career preparation?  ", 0))
     
     cgpa = safe_float(row.get("Current CGPA", 0.0))
-    attendance = str(row.get("Overall Attendance %", "")).strip()
-    backlog = str(row.get("Have you ever received a backlog in any subject?  ", "No")).strip()
-    strong_area = str(row.get("Which academic area do you perform best in? ", "")).strip()
-    weak_area = str(row.get("Which academic area do you find most challenging?  ", "")).strip()
-    career_goal = str(row.get("Which career path interests you the most?   ", "")).strip()
-    projects = str(row.get("How many projects have you completed so far?   ", "0")).strip()
-    code_freq = str(row.get("How often do you practice coding?    ", "")).strip()
-    study_hrs = str(row.get("On average, how many hours do you study per day?  ", "")).strip()
-    technologies = str(row.get("Which technologies are you currently learning?", "")).strip()
-    challenge = str(row.get("What is your biggest challenge right now?  ", "")).strip()
+    attendance = safe_str(row.get("Overall Attendance %", ""))
+    backlog = safe_str(row.get("Have you ever received a backlog in any subject?  ", "No"))
+    strong_area = safe_str(row.get("Which academic area do you perform best in? ", ""))
+    weak_area = safe_str(row.get("Which academic area do you find most challenging?", ""))
+    career_goal = safe_str(row.get("Which career path interests you the most?    ", ""))
+    projects = safe_str(row.get("How many projects have you completed so far?    ", "0"))
+    code_freq = safe_str(row.get("How often do you practice coding?     ", ""))
+    study_hrs = safe_str(row.get("On average, how many hours do you study per day?  ", ""))
+    technologies = safe_str(row.get("Which technologies are you currently learning?", ""))
+    challenge = safe_str(row.get("What is your biggest challenge right now?  ", ""))
     
+    # Calculate scores
     cgpa_score = (cgpa / 10) * 40
     att_map = {"95-100%": 25, "85-94%": 22, "75-84%": 18, "60-74%": 12, "Below 60%": 5}
     att_score = att_map.get(attendance, 15)
@@ -130,6 +134,8 @@ def map_row_to_profile(row, user_id):
         persona = "Career-Focused Learner"
     else:
         persona = "Balanced Learner"
+    
+    print(f"Profile created for user {user_id}: CGPA={cgpa}, Success={success_score}, Risk={academic_risk}")
     
     return {
         "user_id": user_id,
