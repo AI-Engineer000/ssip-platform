@@ -382,6 +382,41 @@ def check_db():
             'exists': False,
             'message': 'No profile found for this user'
         })
+@app.route('/force-profile')
+def force_profile():
+    if 'user' not in session:
+        return redirect('/login')
+    
+    profile_data = {
+        "user_id": session['user_id'],
+        "cgpa": 8.64,
+        "attendance": "95-100%",
+        "backlog": "Maybe",
+        "strong_area": "Core Branch Subjects",
+        "weak_area": "Programming / Coding Subjects",
+        "coding_skill": 4,
+        "problem_solving": 3,
+        "communication": 4,
+        "teamwork": 3,
+        "project_skill": 4,
+        "career_goal": "Government / Public Sector Opportunities",
+        "projects_completed": "1–2",
+        "coding_frequency": "1–2 Times a Week",
+        "study_hours": "4–6 Hours",
+        "placement_confidence": 4,
+        "technologies": "Python, Web Development, Artificial Intelligence / Machine Learning",
+        "biggest_challenge": "Coding / DSA",
+        "persona": "Balanced Learner",
+        "success_score": 75,
+        "placement_readiness": 70,
+        "academic_risk": "Low",
+        "onboarding_done": 1
+    }
+    
+    save_profile_to_db(profile_data)
+    return redirect('/')
+    
+
 @app.before_request
 def cleanup_login_attempts():
     """Remove login attempts older than 5 minutes"""
