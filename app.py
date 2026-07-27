@@ -255,70 +255,55 @@ login_attempts = {}
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        try:
-            username = request.form.get('username', '').strip()
-            password = request.form.get('password', '')
-            
-            print(f"Login attempt for username: {username}")
-            
-            if not username or not password:
-                return render_template('login.html', error="Please fill in all fields.")
-            
-            conn = get_db()
-            user = conn.execute(
-                "SELECT * FROM users WHERE username = ? OR email = ?",
-                (username, username)
-            ).fetchone()
-            conn.close()
-            
-            if not user:
-                print("User not found")
-                return render_template('login.html', error="Invalid username or email.")
-            
-            if not check_password_hash(user['password'], password):
-                print("Invalid password")
-                return render_template('login.html', error="Invalid password.")
-            
-            print(f"Login successful for user: {user['username']}")
-            
-            session.permanent = True
-            session['user'] = user['username']
-            session['user_id'] = user['id']
-            session['user_name'] = user['name']
-            session['user_email'] = user['email']
-            
-            # Check if profile exists
-            print("Checking profile...")
-            conn = get_db()
-            profile = conn.execute(
-                "SELECT onboarding_done FROM student_profile WHERE user_id=?",
-                (user['id'],)
-            ).fetchone()
-            conn.close()
-            
-            if profile and profile['onboarding_done'] == 1:
-                print("Profile exists, redirecting to dashboard")
-                return redirect('/')
-            
-            # Check Google Sheets
-            print("Checking Google Sheets...")
-            sheet_row = find_student_by_email(user['email'])
-            
-            if sheet_row:
-                print("Found in Google Sheets, saving profile...")
-                profile_data = map_row_to_profile(sheet_row, user['id'])
-                save_profile_to_db(profile_data)
-                print("Profile saved, redirecting to dashboard")
-                return redirect('/')
-            
-            print("No profile found, redirecting to complete-profile")
-            return redirect('/complete-profile')
-            
-        except Exception as e:
-            print(f"ERROR in login: {e}")
-            import traceback
-            traceback.print_exc()
-            return render_template('login.html', error="An error occurred. Please try again.")
+        username = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+        
+        if not username or not password:
+            return render_template('login.html', error="Please fill in all fields.")
+        
+        conn = get_db()
+        user = conn.execute(
+            "SELECT * FROM users WHERE username = ? OR email = ?",
+            (username, username)
+        ).fetchone()
+        conn.close()
+        
+        if not user:
+            return render_template('login.html', error="Invalid username or email.")
+        
+        if not check_password_hash(user['password'], password):
+            return render_template('login.html', error="Invalid password.")
+        
+        session.permanent = True
+        session['user'] = user['username']
+        session['user_id'] = user['id']
+        session['user_name'] = user['name']
+        session['user_email'] = user['email']
+        
+        # Check if profile exists
+        conn = get_db()
+        profile = conn.execute(
+            "SELECT onboarding_done FROM student_profile WHERE user_id=?",
+            (user['id'],)
+        ).fetchone()
+        conn.close()
+        
+        if profile and profile['onboarding_done'] == 1:
+            return redirect('/')
+        
+        # Check Google Sheets
+        print(f"Looking up email: {user['email']}")
+        sheet_row = find_student_by_email(user['email'])
+        
+        if sheet_row:
+            print("Found in Google Sheets, creating profile...")
+            profile_data = map_row_to_profile(sheet_row, user['id'])
+            save_profile_to_db(profile_data)
+            print("Profile saved successfully!")
+            return redirect('/')
+        
+        print("Not found in Google Sheets, redirecting to complete profile")
+        return redirect('/complete-profile')
     
     return render_template('login.html')
 
