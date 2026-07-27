@@ -39,11 +39,7 @@ def find_student_by_email(email):
         print(f"Looking for email: {email}")
         print(f"Total records: {len(records)}")
         
-        if records:
-            print("Column names in sheet:", list(records[0].keys()))
-        
         for idx, row in enumerate(records):
-            # Check both email columns
             email1 = str(row.get("Email Address", "")).strip().lower()
             email2 = str(row.get("College Email ID", "")).strip().lower()
             
@@ -62,51 +58,60 @@ def find_student_by_email(email):
 def map_row_to_profile(row, user_id):
     def safe_int(val, default=0):
         try:
-            return int(str(val).strip())
+            if val is None or str(val).strip() == '':
+                return default
+            return int(float(str(val).strip()))
         except:
             return default
     
     def safe_float(val, default=0.0):
         try:
+            if val is None or str(val).strip() == '':
+                return default
             return float(str(val).strip())
         except:
             return default
     
     def safe_str(val, default=""):
         try:
+            if val is None:
+                return default
             return str(val).strip()
         except:
             return default
     
-    # Map all fields with exact column names from your form
+    # EXACT column names from your sheet (with spaces)
     coding_skill = safe_int(row.get("Rate your coding / technical skills.  ", 0))
     problem_solving = safe_int(row.get("Rate your problem-solving ability.  ", 0))
     communication = safe_int(row.get("Rate your communication skills.", 0))
     teamwork = safe_int(row.get("Rate your Teamwork & Collaboration Skills", 0))
-    project_skill = safe_int(row.get("Rate your project-building / practical implementation skills.    ", 0))
+    project_skill = safe_int(row.get("Rate your project-building / practical implementation skills.   ", 0))
     placement_conf = safe_int(row.get("How confident are you about your placement/career preparation?  ", 0))
     
     cgpa = safe_float(row.get("Current CGPA", 0.0))
     attendance = safe_str(row.get("Overall Attendance %", ""))
     backlog = safe_str(row.get("Have you ever received a backlog in any subject?  ", "No"))
     strong_area = safe_str(row.get("Which academic area do you perform best in? ", ""))
-    weak_area = safe_str(row.get("Which academic area do you find most challenging?", ""))
-    career_goal = safe_str(row.get("Which career path interests you the most?    ", ""))
-    projects = safe_str(row.get("How many projects have you completed so far?    ", "0"))
-    code_freq = safe_str(row.get("How often do you practice coding?     ", ""))
+    weak_area = safe_str(row.get("Which academic area do you find most challenging?  ", ""))
+    career_goal = safe_str(row.get("Which career path interests you the most?   ", ""))
+    projects = safe_str(row.get("How many projects have you completed so far?   ", "0"))
+    code_freq = safe_str(row.get("How often do you practice coding?    ", ""))
     study_hrs = safe_str(row.get("On average, how many hours do you study per day?  ", ""))
     technologies = safe_str(row.get("Which technologies are you currently learning?", ""))
     challenge = safe_str(row.get("What is your biggest challenge right now?  ", ""))
     
+    print(f"Extracted - CGPA: {cgpa}, Coding: {coding_skill}, Attendance: {attendance}")
+    print(f"Career: {career_goal}, Projects: {projects}")
+    
     # Calculate scores
-    cgpa_score = (cgpa / 10) * 40
+    cgpa_score = (cgpa / 10) * 40 if cgpa > 0 else 0
     att_map = {"95-100%": 25, "85-94%": 22, "75-84%": 18, "60-74%": 12, "Below 60%": 5}
     att_score = att_map.get(attendance, 15)
     freq_map = {"Daily": 20, "3-5 Times a Week": 17, "3–5 Times a Week": 17, "1-2 Times a Week": 12, "1–2 Times a Week": 12, "Rarely": 6, "Never": 0}
     consistency_score = freq_map.get(code_freq, 10)
-    avg_skill = (coding_skill + problem_solving + project_skill) / 3
+    avg_skill = (coding_skill + problem_solving + project_skill) / 3 if (coding_skill + problem_solving + project_skill) > 0 else 2
     skill_score = (avg_skill / 5) * 15
-    backlog_penalty = 10 if backlog == "Yes" else (4 if backlog == "Maybe" else 0)
+    backlog_penalty = 10 if backlog.lower() == "yes" else (4 if backlog.lower() == "maybe" else 0)
     
     success_score = max(0, min(100, int(cgpa_score + att_score + consistency_score + skill_score - backlog_penalty)))
     
@@ -117,7 +122,7 @@ def map_row_to_profile(row, user_id):
     cons_score2 = (consistency_score / 20) * 20
     placement_readiness = max(0, min(100, int(tech_score + proj_score + comm_score + cons_score2)))
     
-    if cgpa < 6.0 or attendance in ["Below 60%", "60-74%"] or backlog == "Yes":
+    if cgpa < 6.0 or attendance in ["Below 60%", "60-74%"] or backlog.lower() == "yes":
         academic_risk = "High"
     elif cgpa < 7.5 or attendance == "75-84%":
         academic_risk = "Medium"
@@ -135,7 +140,7 @@ def map_row_to_profile(row, user_id):
     else:
         persona = "Balanced Learner"
     
-    print(f"Profile created for user {user_id}: CGPA={cgpa}, Success={success_score}, Risk={academic_risk}")
+    print(f"Profile created - Success: {success_score}, Risk: {academic_risk}")
     
     return {
         "user_id": user_id,
