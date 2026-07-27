@@ -321,7 +321,58 @@ def login():
             return render_template('login.html', error="An error occurred. Please try again.")
     
     return render_template('login.html')
-    
+
+@app.route('/test-google')
+def test_google():
+    try:
+        import gspread
+        from google.oauth2.service_account import Credentials
+        import json
+        import base64
+        import os
+        
+        # Try to get credentials
+        creds_b64 = os.getenv("GOOGLE_CREDENTIALS")
+        if creds_b64:
+            creds_data = base64.b64decode(creds_b64).decode('utf-8')
+            creds_dict = json.loads(creds_data)
+            creds = Credentials.from_service_account_info(
+                creds_dict,
+                scopes=["https://www.googleapis.com/auth/spreadsheets.readonly"]
+            )
+        else:
+            with open("credentials.json", "r") as f:
+                creds_dict = json.load(f)
+            creds = Credentials.from_service_account_info(
+                creds_dict,
+                scopes=["https://www.googleapis.com/auth/spreadsheets.readonly"]
+            )
+        
+        client = gspread.authorize(creds)
+        sheet = client.open_by_key("1Z7DK3kCkJEX-P-ddOD4e7_szK-iPADSpFEHi2wP9lN4").sheet1
+        
+        # Try to get just 2 rows
+        all_values = sheet.get_all_values()
+        
+        if all_values:
+            return jsonify({
+                'success': True,
+                'total_rows': len(all_values),
+                'headers': all_values[0] if all_values else [],
+                'first_row': all_values[1] if len(all_values) > 1 else [],
+                'email_check': '25ai1aa1@mitsgwl.ac.in' in str(all_values).lower()
+            })
+        else:
+            return jsonify({'success': False, 'error': 'No data'})
+            
+    except Exception as e:
+        import traceback
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        })
+        
 @app.before_request
 def cleanup_login_attempts():
     """Remove login attempts older than 5 minutes"""
