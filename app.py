@@ -15,7 +15,9 @@ from reportlab.lib import colors
 from reportlab.lib.units import cm
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-
+from sheets_service import find_student_by_email, map_row_to_profile
+from model import analyze_student
+from career_data import CAREER_PATHS, SKILL_SOURCES
 _last_ai_call_ts = {}
 
 load_dotenv()
@@ -357,7 +359,29 @@ def test_google():
             'error': str(e),
             'traceback': traceback.format_exc()
         })
-        
+
+@app.route('/check-db')
+def check_db():
+    if 'user' not in session:
+        return jsonify({'error': 'Not logged in'}), 401
+    
+    conn = get_db()
+    profile = conn.execute(
+        "SELECT * FROM student_profile WHERE user_id = ?",
+        (session['user_id'],)
+    ).fetchone()
+    conn.close()
+    
+    if profile:
+        return jsonify({
+            'exists': True,
+            'profile': dict(profile)
+        })
+    else:
+        return jsonify({
+            'exists': False,
+            'message': 'No profile found for this user'
+        })
 @app.before_request
 def cleanup_login_attempts():
     """Remove login attempts older than 5 minutes"""
